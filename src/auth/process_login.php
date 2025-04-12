@@ -1,5 +1,5 @@
 <?php
-  require_once __DIR__ . "../../config/database.php";
+  require_once __DIR__ . "/../../config/database.php";
   session_start();
   
   if ($_SERVER["REQUEST_METHOD"]=="POST"){
@@ -19,7 +19,7 @@
     if ($user && password_verify($password, $user["password"])){
       $_SESSION["user_id"] = $user["id"];
       $_SESSION["user_username"] = $user["username"];
-      header("location: /public/index.php");
+      header("location: /gyaanuday/public/index.php");
       exit;
     }else{
       die("Invalid email or password");
