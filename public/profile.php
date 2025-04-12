@@ -215,61 +215,40 @@
     <div class="container mx-auto px-4 py-8">
         <h1 class="text-center text-4xl font-normal text-[#171a1f] mb-12 font-['Archivo']">Uploaded Projects</h1>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Modern Web Design -->
-            <div class="bg-white rounded-md border border-[#bdc1ca] p-4">
-                <img src="https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/image-20.png" alt="Modern Web Design" class="w-full h-40 object-cover rounded-lg mb-4">
-                <h2 class="text-lg font-bold text-[#171a1f] mb-2">Modern Web Design</h2>
-                <p class="text-[#9095a1] text-sm mb-2">A sleek and user-friendly website layout.</p>
-                <p class="text-[#9095a1] text-sm mb-4">This project focuses on minimalism and interactivity.</p>
-                <button class="w-full border border-[#5f7b12] text-[#5f7b12] py-2 rounded-md hover:bg-[#5f7b12] hover:text-white transition-colors">Like</button>
-            </div>
-
-            <!-- App Interface -->
-            <div class="bg-white rounded-md border border-[#bdc1ca] p-4">
-                <img src="https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/image-20-2.png" alt="App Interface" class="w-full h-40 object-cover rounded-lg mb-4">
-                <h2 class="text-lg font-bold text-[#171a1f] mb-2">App Interface</h2>
-                <p class="text-[#9095a1] text-sm mb-2">A responsive and interactive app design.</p>
-                <p class="text-[#9095a1] text-sm mb-4">The project emphasizes intuitive navigation.</p>
-                <button class="w-full border border-[#5f7b12] text-[#5f7b12] py-2 rounded-md hover:bg-[#5f7b12] hover:text-white transition-colors">Like</button>
-            </div>
-
-            <!-- Branding Kit -->
-            <div class="bg-white rounded-md border border-[#bdc1ca] p-4">
-                <img src="https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/image-20-3.png" alt="Branding Kit" class="w-full h-40 object-cover rounded-lg mb-4">
-                <h2 class="text-lg font-bold text-[#171a1f] mb-2">Branding Kit</h2>
-                <p class="text-[#9095a1] text-sm mb-2">A comprehensive branding package.</p>
-                <p class="text-[#9095a1] text-sm mb-4">Includes logos, color schemes, and typography.</p>
-                <button class="w-full border border-[#5f7b12] text-[#5f7b12] py-2 rounded-md hover:bg-[#5f7b12] hover:text-white transition-colors">Like</button>
-            </div>
-
-            <!-- E-commerce Design -->
-            <div class="bg-white rounded-md border border-[#bdc1ca] p-4">
-                <img src="https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/image-20-4.png" alt="E-commerce Design" class="w-full h-40 object-cover rounded-lg mb-4">
-                <h2 class="text-lg font-bold text-[#171a1f] mb-2">E-commerce Design</h2>
-                <p class="text-[#9095a1] text-sm mb-2">A user-centric e-commerce design.</p>
-                <p class="text-[#9095a1] text-sm mb-4">Focuses on seamless checkout experience.</p>
-                <button class="w-full border border-[#5f7b12] text-[#5f7b12] py-2 rounded-md hover:bg-[#5f7b12] hover:text-white transition-colors">Like</button>
-            </div>
-
-            <!-- Photo Portfolio -->
-            <div class="bg-white rounded-md border border-[#bdc1ca] p-4">
-                <img src="https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/image-20-5.png" alt="Photo Portfolio" class="w-full h-40 object-cover rounded-lg mb-4">
-                <h2 class="text-lg font-bold text-[#171a1f] mb-2">Photo Portfolio</h2>
-                <p class="text-[#9095a1] text-sm mb-2">A portfolio showcasing stunning photography.</p>
-                <p class="text-[#9095a1] text-sm mb-4">Arranged in an elegant and clean layout.</p>
-                <button class="w-full border border-[#5f7b12] text-[#5f7b12] py-2 rounded-md hover:bg-[#5f7b12] hover:text-white transition-colors">Like</button>
-            </div>
-
-            <!-- Social Media Campaign -->
-            <div class="bg-white rounded-md border border-[#bdc1ca] p-4">
-                <img src="https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/image-20-6.png" alt="Social Media Campaign" class="w-full h-40 object-cover rounded-lg mb-4">
-                <h2 class="text-lg font-bold text-[#171a1f] mb-2">Social Media Campaign</h2>
-                <p class="text-[#9095a1] text-sm mb-2">Visuals for a dynamic social media campaign.</p>
-                <p class="text-[#9095a1] text-sm mb-4">Includes graphics and promotional content.</p>
-                <button class="w-full border border-[#5f7b12] text-[#5f7b12] py-2 rounded-md hover:bg-[#5f7b12] hover:text-white transition-colors">Like</button>
-            </div>
-        </div>
+        <?php
+        // Fetch user's projects from the database
+        $stmt = $pdo->prepare("SELECT * FROM projects WHERE user_id = ?");
+        $stmt->execute([$user_id]);
+        $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        if (count($projects) > 0) {
+            echo '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">';
+            
+            foreach ($projects as $project) {
+                // Set default image if none available
+                $projectImage = !empty($project['thumbnail']) ? "/gyaanuday/uploads/". htmlspecialchars($project['thumbnail']) : "https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/image-20.png";
+                
+                echo '<div class="bg-white rounded-md border border-[#bdc1ca] p-4">
+                    <div class="cursor-pointer project-card" data-project-id="' . $project['id'] . '">
+                        <img src="' . $projectImage . '" alt="' . htmlspecialchars($project['title']) . '" class="w-full h-40 object-cover rounded-lg mb-4">
+                        <h2 class="text-lg font-bold text-[#171a1f] mb-2">' . htmlspecialchars($project['title']) . '</h2>
+                        <p class="text-[#9095a1] text-sm mb-2">' . htmlspecialchars($project['short_description']) . '</p>
+                        <p class="text-[#9095a1] text-sm mb-4">' . htmlspecialchars($project['description']) . '</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="flex-1 border border-[#5f7b12] text-[#5f7b12] py-2 rounded-md hover:bg-[#5f7b12] hover:text-white transition-colors">Like</button>
+                        <button class="flex-1 border border-[#d32f2f] text-[#d32f2f] py-2 rounded-md hover:bg-[#d32f2f] hover:text-white transition-colors delete-project" data-project-id="' . $project['id'] . '">Delete</button>
+                    </div>
+                </div>';
+            }
+            
+            echo '</div>';
+        } else {
+            echo '<div class="text-center py-8 text-gray-500">
+                <p>You haven\'t uploaded any projects yet.</p>
+            </div>';
+        }
+        ?>
     </div>
 
     <!-- Bookmarked Projects Section -->
@@ -375,6 +354,24 @@
         document.getElementById('profile_photo_input').addEventListener('change', function(e) {
             const fileName = e.target.files[0]?.name || 'No file selected';
             document.getElementById('file_name_display').textContent = fileName;
+        });
+        
+        // Project deletion functionality
+        document.querySelectorAll('.delete-project').forEach(button => {
+            button.addEventListener('click', function() {
+                const projectId = this.getAttribute('data-project-id');
+                if (confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
+                    window.location.href = '../src/projects/delete_project.php?id=' + projectId;
+                }
+            });
+        });
+        
+        // Project card click to view details
+        document.querySelectorAll('.project-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const projectId = this.getAttribute('data-project-id');
+                window.location.href = 'project_details.php?id=' + projectId;
+            });
         });
     </script>
 </body>
