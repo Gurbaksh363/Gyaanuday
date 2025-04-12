@@ -3,45 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Showcase</title>
+    <title>Profile | Project Showcase</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Archivo&display=swap');
+        body {
+          font-family: 'Inter', sans-serif;
+        }
+        h1, h2, h3 {
+          font-family: 'Archivo', sans-serif;
+        }
+        .nav-item {
+          transition: all 0.3s ease;
+        }
+        .nav-item:hover {
+          color: #A7D820;
+        }
+        .nav-item-active {
+          color: #A7D820;
+          position: relative;
+        }
+        .nav-item-active::after {
+          content: '';
+          position: absolute;
+          bottom: -10px;
+          left: 0;
+          width: 100%;
+          height: 3px;
+          background-color: #A7D820;
+          border-radius: 2px;
+        }
     </style>
 </head>
 <body class="bg-white">
-    <!-- Header Component -->
-    <header class="w-full max-w-[1440px] h-[56px] bg-white border-b border-black flex items-center px-6">
-        <!-- Logo Section -->
-        <div class="flex items-center gap-2">
-            <img src="https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/image-2.png" alt="Logo" class="w-9 h-9">
-            <span class="text-[28px] leading-[42px] font-archivo text-black">Project Showcase</span>
-        </div>
-
-        <!-- Navigation Menu -->
-        <nav class="ml-[75px] h-[52px] flex items-center">
-            <div class="flex h-full">
-                <div class="w-[93.67px] h-full flex items-center justify-center rounded-md hover:bg-gray-100 cursor-pointer">
-                    <span class="text-[14px] leading-[22px] font-inter text-[#565d6d]">Home</span>
-                </div>
-                <div class="w-[107.67px] h-full flex items-center justify-center rounded-md hover:bg-gray-100 cursor-pointer">
-                    <span class="text-[14px] leading-[22px] font-inter text-[#565d6d]">Projects</span>
-                </div>
-                <div class="w-[98.67px] h-full flex flex-col items-center justify-center rounded-md relative cursor-pointer">
-                    <span class="text-[14px] leading-[22px] font-bold font-inter text-[#a7d820]">Profile</span>
-                    <div class="absolute bottom-0 w-full h-1 bg-[#a7d820] rounded-sm"></div>
-                </div>
+    <!-- Improved Navigation Bar -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between h-16">
+            <div class="flex items-center">
+              <div class="flex-shrink-0 flex items-center">
+                <span class="text-2xl font-bold mr-1" style="color: #A7D820;"><i class="fas fa-project-diagram"></i></span>
+                <span class="text-[28px] leading-[42px] font-archivo ml-2">Project Showcase</span>
+              </div>
+              <div class="ml-10 flex items-baseline space-x-4">
+                <a href="index.php" class="px-3 py-2 text-[14px] leading-[22px] text-[#565d6d] nav-item">
+                  <i class="fas fa-home mr-1"></i> Home
+                </a>
+                <a href="projects.php" class="px-3 py-2 text-[14px] leading-[22px] text-[#565d6d] nav-item">
+                  <i class="fas fa-folder-open mr-1"></i> Projects
+                </a>
+                <a href="profile.php" class="px-3 py-2 text-[14px] leading-[22px] font-semibold nav-item nav-item-active">
+                  <i class="fas fa-user mr-1"></i> Profile
+                </a>
+              </div>
             </div>
-        </nav>
-
-        <!-- Right Section -->
-        <div class="ml-auto flex items-center gap-4">
-            <img src="https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/b-meetin.png" alt="Meeting" class="w-6 h-6 cursor-pointer hover:opacity-80">
-            <img src="https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/bell.png" alt="Notifications" class="w-6 h-6 cursor-pointer hover:opacity-80">
-            <img src="https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/search.png" alt="Search" class="w-6 h-6 cursor-pointer hover:opacity-80">
-            <img src="https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/avatar.png" alt="Avatar" class="w-9 h-9 cursor-pointer">
+            <div class="flex items-center space-x-4">
+              <button class="rounded-full p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                <i class="fas fa-search"></i>
+              </button>
+              <button class="rounded-full p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                <i class="fas fa-bell"></i>
+              </button>
+              <img src="https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/avatar.png" alt="Avatar" class="w-9 h-9 rounded-full cursor-pointer">
+            </div>
+          </div>
         </div>
-    </header>
+    </nav>
 
     <!-- User Profile Section -->
     <div class="flex justify-center items-center min-h-screen bg-white">
