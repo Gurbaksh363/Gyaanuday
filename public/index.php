@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Project Showcase</title>
+  <title>Gyaanuday</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <style>
@@ -53,16 +53,16 @@
 </head>
 
 <body class="bg-white">
-  <!-- Improved Navigation Bar -->
+  <!-- Fixed Navigation Bar -->
   <nav class="bg-white shadow-md sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16">
         <div class="flex items-center">
           <div class="flex-shrink-0 flex items-center">
             <span class="text-2xl font-bold mr-1" style="color: #A7D820;"><i class="fas fa-project-diagram"></i></span>
-            <span class="text-[28px] leading-[42px] font-archivo ml-2">Project Showcase</span>
+            <span class="text-[28px] leading-[42px] font-archivo ml-2">Gyaanuday</span>
           </div>
-          <div class="ml-10 flex items-baseline space-x-4"></div>
+          <div class="ml-10 flex items-baseline space-x-4">
             <a href="index.php" class="px-3 py-2 text-[14px] leading-[22px] font-semibold nav-item nav-item-active">
               <i class="fas fa-home mr-1"></i> Home
             </a>
@@ -81,7 +81,7 @@
           <button class="rounded-full p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
             <i class="fas fa-bell"></i>
           </button>
-          <div class="flex space-x-3"></div>
+          <div class="flex space-x-3">
             <a href="register.php" class="border border-gray-300 px-4 py-2 rounded text-[#565d6d] button-hover inline-block">Sign Up</a>
             <a href="login.php" class="px-4 py-2 rounded text-white button-hover shadow-md inline-block" style="background-color: #A7D820;">Sign In</a>
           </div>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile | Project Showcase</title>
+    <title>Profile | Gyaanuday</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
@@ -44,7 +44,7 @@
             <div class="flex items-center">
               <div class="flex-shrink-0 flex items-center">
                 <span class="text-2xl font-bold mr-1" style="color: #A7D820;"><i class="fas fa-project-diagram"></i></span>
-                <span class="text-[28px] leading-[42px] font-archivo ml-2">Project Showcase</span>
+                <span class="text-[28px] leading-[42px] font-archivo ml-2">Gyaanuday</span>
               </div>
               <div class="ml-10 flex items-baseline space-x-4">
                 <a href="index.php" class="px-3 py-2 text-[14px] leading-[22px] text-[#565d6d] nav-item">

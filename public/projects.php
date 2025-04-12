@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Projects | Project Showcase</title>
+  <title>Projects | Gyaanuday</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <style>
@@ -49,10 +49,34 @@
       transform: translateY(-2px);
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
+    .custom-file-input {
+      position: relative;
+      display: inline-block;
+    }
+    .custom-file-input input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+    .custom-file-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .gallery-preview img {
+      transition: all 0.3s ease;
+    }
+    .gallery-preview img:hover {
+      transform: scale(1.05);
+    }
   </style>
 </head>
 
-<body class="bg-white text-gray-900">
+<body class="bg-gray-50 text-gray-900">
   <!-- Improved Navigation Bar -->
   <nav class="bg-white shadow-md sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -60,7 +84,7 @@
         <div class="flex items-center">
           <div class="flex-shrink-0 flex items-center">
             <span class="text-2xl font-bold mr-1" style="color: #A7D820;"><i class="fas fa-project-diagram"></i></span>
-            <span class="text-[28px] leading-[42px] font-archivo ml-2">Project Showcase</span>
+            <span class="text-[28px] leading-[42px] font-archivo ml-2">Gyaanuday</span>
           </div>
           <div class="ml-10 flex items-baseline space-x-4">
             <a href="index.php" class="px-3 py-2 text-[14px] leading-[22px] text-[#565d6d] nav-item">
@@ -89,59 +113,91 @@
     </div>
   </nav>
 
-  <!-- Upload Section -->
-  <div class="p-8 max-w-4xl mx-auto flex justify-between items-start">
-    <form class="w-1/2" action="/gyaanuday/src/projects/add_project.php" method="POST" enctype="multipart/form-data">
-      <h2 class="text-[32px] leading-[48px] font-semibold text-[#171a1f] font-archivo">Showcase Your Projects</h2>
-
-      <input type="text" name="title" class="mt-4 w-full border p-2 rounded-lg shadow-sm focus:ring-2 focus:ring-[#A7D820] focus:border-transparent outline-none" placeholder="Project Title" required>
-
-      <div class="mt-4 relative">
-        <input type="file" id="project-upload" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-10"
-          name="project_file" required>
-        <label for="project-upload" class="text-white py-2 px-4 rounded-lg flex items-center cursor-pointer shadow-md button-hover"
-          style="background-color: #A7D820;">
-          ⬆ Upload your project
-        </label>
+  <!-- Improved Upload Section -->
+  <div class="container mx-auto pt-10 pb-16">
+    <div class="max-w-6xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+      <div class="flex flex-col md:flex-row">
+        <!-- Form section -->
+        <div class="md:w-2/3 p-8">
+          <h2 class="text-[32px] leading-[48px] font-semibold text-[#171a1f] font-archivo mb-6">Showcase Your Projects</h2>
+          
+          <form action="/gyaanuday/src/projects/add_project.php" method="POST" enctype="multipart/form-data" class="space-y-6">
+            <div>
+              <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Project Title</label>
+              <input type="text" name="title" id="title" class="w-full border border-gray-300 p-3 rounded-lg shadow-sm focus:ring-2 focus:ring-[#A7D820] focus:border-transparent outline-none" placeholder="Enter your project title" required>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label for="project-upload" class="block text-sm font-medium text-gray-700 mb-1">Project File</label>
+                <div class="mt-1 flex">
+                  <div class="custom-file-input w-full">
+                    <input type="file" id="project-upload" name="project_file" required class="hidden">
+                    <button type="button" onclick="document.getElementById('project-upload').click()" class="w-full bg-[#A7D820] text-white py-3 px-4 rounded-lg flex items-center justify-center cursor-pointer shadow-sm button-hover">
+                      <i class="fas fa-upload mr-2"></i> Upload Project
+                    </button>
+                  </div>
+                </div>
+                <span id="project-file-name" class="text-xs text-gray-500 mt-1 block">No file selected</span>
+              </div>
+              
+              <div>
+                <label for="thumbnail-upload" class="block text-sm font-medium text-gray-700 mb-1">Thumbnail Image</label>
+                <div class="mt-1 flex">
+                  <div class="custom-file-input w-full">
+                    <input type="file" id="thumbnail-upload" name="thumbnail" accept="image/*" required class="hidden">
+                    <button type="button" onclick="document.getElementById('thumbnail-upload').click()" class="w-full bg-[#A7D820] text-white py-3 px-4 rounded-lg flex items-center justify-center cursor-pointer shadow-sm button-hover">
+                      <i class="fas fa-image mr-2"></i> Upload Thumbnail
+                    </button>
+                  </div>
+                </div>
+                <span id="thumbnail-file-name" class="text-xs text-gray-500 mt-1 block">No file selected</span>
+              </div>
+            </div>
+            
+            <div>
+              <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Project Description</label>
+              <textarea name="description" id="description" rows="4" class="w-full border border-gray-300 p-3 rounded-lg shadow-sm focus:ring-2 focus:ring-[#A7D820] focus:border-transparent outline-none text-[16px] leading-[26px]" placeholder="Describe your project in detail..." required></textarea>
+            </div>
+            
+            <div>
+              <label for="tags" class="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+              <input type="text" name="tags" id="tags" class="w-full border border-gray-300 p-3 rounded-lg shadow-sm focus:ring-2 focus:ring-[#A7D820] focus:border-transparent outline-none" placeholder="Add tags separated by commas (e.g. web, design, UI/UX)" required>
+            </div>
+            
+            <button type="submit" class="w-full md:w-auto bg-[#A7D820] text-white py-3 px-8 rounded-lg flex items-center justify-center shadow-md button-hover">
+              <i class="fas fa-paper-plane mr-2"></i> Submit Project
+            </button>
+          </form>
+        </div>
+        
+        <!-- Preview section -->
+        <div class="md:w-1/3 bg-gray-50 p-8">
+          <h3 class="text-lg font-semibold text-[#171a1f] mb-6">Project Inspiration</h3>
+          <div class="gallery-preview grid grid-cols-2 gap-3">
+            <img src="h1.jpg" class="w-full h-24 object-cover rounded-lg shadow-sm">
+            <img src="h2.jpg" class="w-full h-24 object-cover rounded-lg shadow-sm">
+            <img src="h3.jpg" class="w-full h-24 object-cover rounded-lg shadow-sm">
+            <img src="h4.jpg" class="w-full h-24 object-cover rounded-lg shadow-sm">
+            <img src="h5.jpg" class="w-full h-24 object-cover rounded-lg shadow-sm">
+            <div class="w-full h-24 bg-[#A7D820] bg-opacity-20 rounded-lg flex items-center justify-center text-[#A7D820]">
+              <i class="fas fa-plus text-2xl"></i>
+            </div>
+          </div>
+          <div class="mt-6">
+            <p class="text-sm text-gray-600 leading-relaxed">
+              Share your creative projects with the Gyaanuday community. Whether it's a design, code, or concept, your work could inspire others.
+            </p>
+          </div>
+        </div>
       </div>
-
-      <!-- Thumbnail Upload -->
-      <div class="mt-4 relative">
-        <input type="file" id="thumbnail-upload" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-10"
-          name="thumbnail" accept="image/*" required>
-        <label for="thumbnail-upload" class="text-white py-2 px-4 rounded-lg flex items-center cursor-pointer shadow-md button-hover"
-          style="background-color: #A7D820;">
-          🖼 Upload thumbnail cover
-        </label>
-      </div>
-
-      <textarea name="description" class="mt-4 w-full border p-2 rounded-lg shadow-sm focus:ring-2 focus:ring-[#A7D820] focus:border-transparent outline-none text-[16px] leading-[26px]" placeholder="Project description"
-        required></textarea>
-
-      <input type="text" name="tags" class="mt-2 w-full border p-2 rounded-lg shadow-sm focus:ring-2 focus:ring-[#A7D820] focus:border-transparent outline-none"
-        placeholder="Enter tags (Press enter to add new tag)" required>
-
-      <button type="submit" class="mt-4 text-white py-2 px-4 rounded-lg flex items-center shadow-md button-hover"
-        style="background-color: #A7D820;">
-        Submit Project
-      </button>
-    </form>
-
-    <div class="flex space-x-2 w-1/2 justify-end">
-      <img src="h1.jpg" class="w-16 h-16 object-cover rounded-lg shadow-sm card-hover">
-      <img src="h5.jpg" class="w-16 h-16 object-cover rounded-lg shadow-sm card-hover">
-      <img src="h3.jpg" class="w-16 h-16 object-cover rounded-lg shadow-sm card-hover">
-      <img src="h4.jpg" class="w-16 h-16 object-cover rounded-lg shadow-sm card-hover">
-    </div>
-    <div>
-      <img src="h2.jpg" class="w-16 h-16 object-cover rounded-lg shadow-sm card-hover">
     </div>
   </div>
 
-  <!-- Featured Projects -->
-  <div class="px-8">
-    <h2 class="text-[32px] leading-[48px] font-semibold text-center text-[#171a1f] font-archivo">Featured Projects</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+  <!-- Featured Projects Section -->
+  <div class="container mx-auto px-8 py-12 bg-white">
+    <h2 class="text-[32px] leading-[48px] font-semibold text-center text-[#171a1f] font-archivo mb-8">Featured Projects</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
       <div class="overflow-hidden rounded-lg shadow-lg border border-[#bdc1ca] card-hover">
         <img src="SkylineView.jpg" class="w-full h-48 object-cover">
         <div class="p-4">
@@ -192,6 +248,19 @@
       </div>
     </div>
   </div>
+
+  <!-- JavaScript for file input display -->
+  <script>
+    document.getElementById('project-upload').addEventListener('change', function(e) {
+      const fileName = e.target.files[0] ? e.target.files[0].name : 'No file selected';
+      document.getElementById('project-file-name').textContent = fileName;
+    });
+    
+    document.getElementById('thumbnail-upload').addEventListener('change', function(e) {
+      const fileName = e.target.files[0] ? e.target.files[0].name : 'No file selected';
+      document.getElementById('thumbnail-file-name').textContent = fileName;
+    });
+  </script>
 </body>
 
 </html>

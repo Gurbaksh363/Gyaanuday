@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up | Project Showcase</title>
+    <title>Sign Up | Gyaanuday</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Archivo&display=swap');
@@ -239,6 +239,7 @@
         .logo-text {
             font-family: 'Archivo', sans-serif;
             font-size: 28px;
+            font-weight: bold;
             margin-left: 8px;
             color: #171a1f;
         }
@@ -248,7 +249,7 @@
     <!-- Simple logo link to go back to home -->
     <a href="index.php" class="logo-link">
         <i class="fas fa-project-diagram text-2xl" style="color: #A7D820;"></i>
-        <span class="logo-text">Project Showcase</span>
+        <span class="logo-text">Gyaanuday</span>
     </a>
 
     <aside class="left-section">
