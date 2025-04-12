@@ -104,10 +104,11 @@
     <div class="grid grid-cols-3 gap-6">
       <?php
       require_once __DIR__ . "/../config/database.php";
-      $stmt = $pdo->query("SELECT p.title, p.project_file, p.description, p.tags, u.username, p.thumbnail FROM projects p JOIN users u ON p.user_id = u.id ORDER BY p.created_at DESC LIMIT 3");
+      $stmt = $pdo->query("SELECT p.id, p.title, p.project_file, p.description, p.tags, u.username, p.thumbnail FROM projects p JOIN users u ON p.user_id = u.id ORDER BY p.created_at DESC LIMIT 3");
       $projects = $stmt->fetchAll();
 
       foreach ($projects as $project) {
+        $projectId = htmlspecialchars($project['id']);
         $fileName = htmlspecialchars($project['thumbnail']);
         $filePath = "/gyaanuday/uploads/" . $fileName;
         $description = htmlspecialchars($project['description']);
@@ -128,14 +129,14 @@
         }
 
         echo "
-        <div class='bg-white shadow-md rounded-lg p-4 border border-[#bdc1ca] card-hover'>
-        <div class='relative'>
+        <a href='project_details.php?id=$projectId' class='bg-white shadow-md rounded-lg p-4 border border-[#bdc1ca] card-hover'>
+          <div class='relative'>
             <img src='$thumb' class='rounded-lg w-full h-48 object-cover' alt='$title'>
-        </div>
-        <h3 class='text-lg font-semibold mt-2 text-[#171a1f]'>$title</h3>
-        <p class='text-[#565d6d] text-[16px] leading-[26px]'>$description</p>
-        <p class='text-[#9095a1] text-[14px] mt-2'>Tags: $tags</p>
-        </div>";
+          </div>
+          <h3 class='text-lg font-semibold mt-2 text-[#171a1f]'>$title</h3>
+          <p class='text-[#565d6d] text-[16px] leading-[26px]'>$description</p>
+          <p class='text-[#9095a1] text-[14px] mt-2'>Tags: $tags</p>
+        </a>";
       }
       ?>
     </div>
