@@ -53,10 +53,65 @@
       display: inline-block;
       margin-bottom: 8px;
     }
+    /* Search overlay styles */
+    .search-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 0;
+      background-color: rgba(255, 255, 255, 0.95);
+      z-index: 100;
+      overflow: hidden;
+      transition: height 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .search-overlay.active {
+      height: 100%;
+    }
+    .search-container {
+      width: 80%;
+      max-width: 600px;
+      transform: translateY(-50px);
+      opacity: 0;
+      transition: all 0.4s ease;
+    }
+    .search-overlay.active .search-container {
+      transform: translateY(0);
+      opacity: 1;
+    }
   </style>
 </head>
 
 <body class="bg-white">
+  <!-- Search Overlay -->
+  <div class="search-overlay" id="searchOverlay">
+    <div class="search-container">
+      <button class="absolute top-8 right-8 text-2xl text-gray-600 hover:text-gray-900" id="closeSearch">
+        <i class="fas fa-times"></i>
+      </button>
+      <h2 class="text-2xl font-archivo font-bold text-center mb-6">Search Projects</h2>
+      <form action="search_results.php" method="GET" class="flex flex-col gap-4">
+        <div class="relative">
+          <input 
+            type="text" 
+            name="q" 
+            placeholder="Search by title, tags..." 
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#A7D820] focus:border-transparent outline-none text-lg"
+            autocomplete="off"
+            required
+          >
+          <button type="submit" class="absolute right-3 top-3 text-gray-400 hover:text-[#A7D820]">
+            <i class="fas fa-search fa-lg"></i>
+          </button>
+        </div>
+        <p class="text-sm text-gray-500 text-center">Press Enter to search or ESC to close</p>
+      </form>
+    </div>
+  </div>
+
   <!-- Fixed Navigation Bar -->
   <nav class="bg-white shadow-md sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -79,7 +134,7 @@
           </div>
         </div>
         <div class="flex items-center space-x-4">
-          <button class="rounded-full p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+          <button id="searchButton" class="rounded-full p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
             <i class="fas fa-search"></i>
           </button>
           <button class="rounded-full p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
@@ -232,6 +287,32 @@
     <!-- Comment Section - Could be implemented in the future -->
   </div>
 
-  <!-- Footer - Could be added for consistency -->
+  <!-- Add this script before closing body tag -->
+  <script>
+    // Search functionality
+    const searchButton = document.getElementById('searchButton');
+    const searchOverlay = document.getElementById('searchOverlay');
+    const closeSearch = document.getElementById('closeSearch');
+    
+    // Open search overlay
+    searchButton.addEventListener('click', () => {
+      searchOverlay.classList.add('active');
+      setTimeout(() => {
+        document.querySelector('.search-container input').focus();
+      }, 400);
+    });
+    
+    // Close search overlay
+    closeSearch.addEventListener('click', () => {
+      searchOverlay.classList.remove('active');
+    });
+    
+    // Close search with ESC key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && searchOverlay.classList.contains('active')) {
+        searchOverlay.classList.remove('active');
+      }
+    });
+  </script>
 </body>
 </html>

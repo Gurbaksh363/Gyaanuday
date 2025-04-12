@@ -1,3 +1,38 @@
+<?php
+// Start session and include database at the very beginning
+session_start();
+require_once __DIR__ . "/../config/database.php";
+
+// Initialize photo_url with a default value
+$photo_url = "https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/avatar.png";
+
+// Get user data if logged in
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+    $stmt->execute([$user_id]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($user) {
+        $profile_photo = $user['profile_photo'] ?? 'default-avatar.png';
+        
+        // Use consistent path handling with the upload path in update_profile.php
+        $photo_path = __DIR__ . "/../uploads/profile_photos/" . $profile_photo;
+        
+        // Use relative path for browser display
+        if (file_exists($photo_path) && $profile_photo) {
+            $photo_url = "../uploads/profile_photos/" . $profile_photo;
+        }
+    }
+} else {
+    // If not logged in, redirect to login
+    header("Location: login.php");
+    exit;
+}
+
+// Debug information - disable in production
+$debug = false;
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,9 +69,64 @@
           background-color: #A7D820;
           border-radius: 2px;
         }
+        /* Search overlay styles */
+        .search-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 0;
+          background-color: rgba(255, 255, 255, 0.95);
+          z-index: 100;
+          overflow: hidden;
+          transition: height 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .search-overlay.active {
+          height: 100%;
+        }
+        .search-container {
+          width: 80%;
+          max-width: 600px;
+          transform: translateY(-50px);
+          opacity: 0;
+          transition: all 0.4s ease;
+        }
+        .search-overlay.active .search-container {
+          transform: translateY(0);
+          opacity: 1;
+        }
     </style>
 </head>
 <body class="bg-white">
+    <!-- Search Overlay -->
+    <div class="search-overlay" id="searchOverlay">
+      <div class="search-container">
+        <button class="absolute top-8 right-8 text-2xl text-gray-600 hover:text-gray-900" id="closeSearch">
+          <i class="fas fa-times"></i>
+        </button>
+        <h2 class="text-2xl font-archivo font-bold text-center mb-6">Search Projects</h2>
+        <form action="search_results.php" method="GET" class="flex flex-col gap-4">
+          <div class="relative">
+            <input 
+              type="text" 
+              name="q" 
+              placeholder="Search by title, tags..." 
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#A7D820] focus:border-transparent outline-none text-lg"
+              autocomplete="off"
+              required
+            >
+            <button type="submit" class="absolute right-3 top-3 text-gray-400 hover:text-[#A7D820]">
+              <i class="fas fa-search fa-lg"></i>
+            </button>
+          </div>
+          <p class="text-sm text-gray-500 text-center">Press Enter to search or ESC to close</p>
+        </form>
+      </div>
+    </div>
+
     <!-- Improved Navigation Bar -->
     <nav class="bg-white shadow-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -59,7 +149,7 @@
               </div>
             </div>
             <div class="flex items-center space-x-4">
-              <button class="rounded-full p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+              <button id="searchButton" class="rounded-full p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
                 <i class="fas fa-search"></i>
               </button>
               <button class="rounded-full p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
@@ -70,39 +160,6 @@
           </div>
         </div>
     </nav>
-
-    <?php
-        // Start session and include database
-        session_start();
-        require_once __DIR__ . "/../config/database.php";
-        
-        // Redirect if not logged in
-        if (!isset($_SESSION['user_id'])) {
-            header("Location: login.php");
-            exit;
-        }
-        
-        // Get user data
-        $user_id = $_SESSION['user_id'];
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
-        $stmt->execute([$user_id]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        $profile_photo = $user['profile_photo'] ?? 'default-avatar.png';
-        
-        // Use consistent path handling with the upload path in update_profile.php
-        $photo_path = __DIR__ . "/../uploads/profile_photos/" . $profile_photo;
-        
-        // Use relative path for browser display
-        if (file_exists($photo_path) && $profile_photo) {
-            $photo_url = "../uploads/profile_photos/" . $profile_photo;
-        } else {
-            $photo_url = "https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/avatar.png";
-        }
-        
-        // Debug information - disable in production
-        $debug = false;
-    ?>
 
     <!-- Show success/error messages -->
     <?php if(isset($_SESSION['success'])): ?>
@@ -122,10 +179,10 @@
     <?php if($debug): ?>
         <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mb-4 max-w-4xl mx-auto mt-4">
             <p>Debug Info:</p>
-            <p>Profile photo in DB: <?= htmlspecialchars($profile_photo) ?></p>
-            <p>Photo path (server): <?= htmlspecialchars($photo_path) ?></p>
+            <p>Profile photo in DB: <?= htmlspecialchars($profile_photo ?? '') ?></p>
+            <p>Photo path (server): <?= htmlspecialchars($photo_path ?? '') ?></p>
             <p>Photo URL (browser): <?= htmlspecialchars($photo_url) ?></p>
-            <p>Photo exists: <?= file_exists($photo_path) ? 'Yes' : 'No' ?></p>
+            <p>Photo exists: <?= isset($photo_path) && file_exists($photo_path) ? 'Yes' : 'No' ?></p>
             <p>Document root: <?= htmlspecialchars($_SERVER['DOCUMENT_ROOT']) ?></p>
         </div>
     <?php endif; ?>
@@ -232,7 +289,7 @@
                     <div class="cursor-pointer project-card" data-project-id="' . $project['id'] . '">
                         <img src="' . $projectImage . '" alt="' . htmlspecialchars($project['title']) . '" class="w-full h-40 object-cover rounded-lg mb-4">
                         <h2 class="text-lg font-bold text-[#171a1f] mb-2">' . htmlspecialchars($project['title']) . '</h2>
-                        <p class="text-[#9095a1] text-sm mb-2">' . htmlspecialchars($project['short_description']) . '</p>
+                        <p class="text-[#9095a1] text-sm mb-2">' . htmlspecialchars($project['short_description'] ?? '') . '</p>
                         <p class="text-[#9095a1] text-sm mb-4">' . htmlspecialchars($project['description']) . '</p>
                     </div>
                     <div class="flex gap-2">
@@ -372,6 +429,31 @@
                 const projectId = this.getAttribute('data-project-id');
                 window.location.href = 'project_details.php?id=' + projectId;
             });
+        });
+
+        // Search functionality
+        const searchButton = document.getElementById('searchButton');
+        const searchOverlay = document.getElementById('searchOverlay');
+        const closeSearch = document.getElementById('closeSearch');
+        
+        // Open search overlay
+        searchButton.addEventListener('click', () => {
+          searchOverlay.classList.add('active');
+          setTimeout(() => {
+            document.querySelector('.search-container input').focus();
+          }, 400);
+        });
+        
+        // Close search overlay
+        closeSearch.addEventListener('click', () => {
+          searchOverlay.classList.remove('active');
+        });
+        
+        // Close search with ESC key
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && searchOverlay.classList.contains('active')) {
+            searchOverlay.classList.remove('active');
+          }
         });
     </script>
 </body>

@@ -1,10 +1,11 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gyaanuday</title>
+  <title>Search Results | Gyaanuday</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <style>
@@ -35,19 +36,19 @@
       background-color: #A7D820;
       border-radius: 2px;
     }
-    .card-hover {
-      transition: all 0.3s ease;
-    }
-    .card-hover:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    }
     .button-hover {
       transition: all 0.3s ease;
     }
     .button-hover:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     }
     /* Search overlay styles */
     .search-overlay {
@@ -97,6 +98,7 @@
             placeholder="Search by title, tags..." 
             class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#A7D820] focus:border-transparent outline-none text-lg"
             autocomplete="off"
+            value="<?php echo htmlspecialchars($_GET['q'] ?? ''); ?>"
             required
           >
           <button type="submit" class="absolute right-3 top-3 text-gray-400 hover:text-[#A7D820]">
@@ -118,7 +120,7 @@
             <span class="text-[28px] leading-[42px] font-archivo ml-2">Gyaanuday</span>
           </div>
           <div class="ml-10 flex items-baseline space-x-4">
-            <a href="index.php" class="px-3 py-2 text-[14px] leading-[22px] font-semibold nav-item nav-item-active">
+            <a href="index.php" class="px-3 py-2 text-[14px] leading-[22px] text-[#565d6d] nav-item">
               <i class="fas fa-home mr-1"></i> Home
             </a>
             <a href="projects.php" class="px-3 py-2 text-[14px] leading-[22px] text-[#565d6d] nav-item">
@@ -138,96 +140,114 @@
           </button>
           <div class="flex space-x-3">
             <a href="register.php" class="border border-gray-300 px-4 py-2 rounded text-[#565d6d] button-hover inline-block">Sign Up</a>
-            <a href="login.php" class="px-4 py-2 rounded text-white button-hover shadow-md inline-block" style="background-color: #A7D820;">Log In</a>
+            <a href="login.php" class="px-4 py-2 rounded text-white button-hover shadow-md inline-block" style="background-color: #A7D820;">Sign In</a>
           </div>
         </div>
       </div>
     </div>
   </nav>
 
-  <header class="relative w-full h-[60vh] bg-cover bg-center" style="background-image: url('discover_project.jpg');">
-    <div
-      class="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-start justify-center text-left text-white pl-16">
-      <h1 class="text-[32px] leading-[48px] font-archivo font-bold">Discover Projects</h1>
-      <p class="mt-2 text-[16px] leading-[26px]">Unleash creativity through hands-on learning</p>
-      <a href="explore_projects.php" class="mt-4 px-6 py-2 rounded text-white shadow-md button-hover" style="background-color: #A7D820;">Explore Projects</a>
+  <div class="max-w-6xl mx-auto my-12 px-4">
+    <?php
+    // Check if search query exists
+    if (!isset($_GET['q']) || empty($_GET['q'])) {
+      echo '<div class="text-center py-8">
+              <h1 class="text-[32px] leading-[48px] font-archivo font-bold text-[#171a1f] mb-4">No Search Query</h1>
+              <p class="text-[#565d6d] mb-6">Please enter a search term to find projects.</p>
+              <a href="projects.php" class="inline-block px-6 py-3 bg-[#A7D820] text-white rounded-lg shadow-md button-hover">
+                Browse All Projects
+              </a>
+            </div>';
+      exit;
+    }
+
+    require_once __DIR__ . "/../config/database.php";
+    
+    $searchQuery = '%' . $_GET['q'] . '%';
+    
+    // Search in titles and tags
+    $stmt = $pdo->prepare("
+      SELECT p.*, u.username 
+      FROM projects p 
+      JOIN users u ON p.user_id = u.id 
+      WHERE p.title LIKE ? OR p.tags LIKE ?
+      ORDER BY p.created_at DESC
+    ");
+    $stmt->execute([$searchQuery, $searchQuery]);
+    $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Display search results header
+    $searchTerm = htmlspecialchars($_GET['q']);
+    $resultCount = count($projects);
+    ?>
+    
+    <div class="mb-8">
+      <h1 class="text-[32px] leading-[48px] font-archivo font-bold text-[#171a1f]">
+        Search Results for "<?php echo $searchTerm; ?>"
+      </h1>
+      <p class="text-[#565d6d]">
+        Found <?php echo $resultCount; ?> project<?php echo $resultCount !== 1 ? 's' : ''; ?> matching your search
+      </p>
     </div>
-  </header>
 
-  <section class="max-w-6xl mx-auto my-12">
-    <h2 class="text-[32px] leading-[48px] font-bold text-center mb-6 text-[#171a1f] font-archivo">Popular Projects</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <?php
-      require_once __DIR__ . "/../config/database.php";
-      $stmt = $pdo->query("SELECT p.id, p.title, p.project_file, p.description, p.tags, u.username, p.thumbnail FROM projects p JOIN users u ON p.user_id = u.id ORDER BY p.created_at DESC LIMIT 6");
-      $projects = $stmt->fetchAll();
+    <?php if ($resultCount > 0): ?>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <?php foreach ($projects as $project): 
+          // Get file path
+          $fileName = htmlspecialchars($project['thumbnail']);
+          $filePath = "/gyaanuday/uploads/" . $fileName;
+          
+          $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
-      foreach ($projects as $project) {
-        $projectId = htmlspecialchars($project['id']);
-        $fileName = htmlspecialchars($project['thumbnail']);
-        $filePath = "/gyaanuday/uploads/" . $fileName;
-        $description = htmlspecialchars($project['description']);
-        $title = htmlspecialchars($project['title']);
-        $tags = htmlspecialchars($project['tags']);
+          if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
+            $thumb = $filePath;
+          } else {
+            $thumb = "/gyaanuday/assets/default_icon.png";
+          }
 
-        $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-
-        $thumb = '';
-
-        // Check if the file is an image
-        if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
-          // For image files, use the image itself as the thumbnail
-          $thumb = $filePath;
-        } else {
-          // For other file types (e.g., PDF, MP4, MP3), show a default thumbnail
-          $thumb = "/gyaanuday/assets/default_icon.png"; // Use your own icon or placeholder for non-image files
-        }
-
-        echo "
-        <a href='project_details.php?id=$projectId' class='bg-white shadow-md rounded-lg p-4 border border-[#bdc1ca] card-hover'>
-          <div class='relative'>
-            <img src='$thumb' class='rounded-lg w-full h-48 object-cover' alt='$title'>
-          </div>
-          <h3 class='text-lg font-semibold mt-2 text-[#171a1f]'>$title</h3>
-          <p class='text-[#565d6d] text-[16px] leading-[26px]'>$description</p>
-          <p class='text-[#9095a1] text-[14px] mt-2'>Tags: $tags</p>
-        </a>";
-      }
-      ?>
-    </div>
-  </section>
-
-  <section class="max-w-6xl mx-auto my-12">
-    <h2 class="text-[32px] leading-[48px] font-bold text-center mb-6 text-[#171a1f] font-archivo">Explore by Categories</h2>
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-      <?php
-      // Define common categories with their images
-      $popularCategories = [
-        'Web Development' => 'web_dev.webp',
-        'Mobile Apps' => 'mobile.jpg',
-        'Data Analysis' => 'data_anyl.jpg',
-        'UI/UX Design' => 'ui_ux.jpg',
-        'AI & ML' => 'ai.jpg',
-        'Blockchain' => 'block_chain.jpg',
-        'Game Development' => 'game_dev.jpg',
-        'Cybersecurity' => 'cyber_security.jpg',
-        'IoT Projects' => 'default_category.jpg',
-        'Cloud Computing' => 'default_category.jpg'
-      ];
-      
-      // Display categories as clickable cards
-      foreach ($popularCategories as $category => $image) {
-        echo '
-        <a href="search_results.php?q=' . urlencode($category) . '" class="relative rounded-lg overflow-hidden shadow-md h-32 card-hover">
-          <img src="' . $image . '" class="absolute inset-0 w-full h-full object-cover" alt="' . htmlspecialchars($category) . '">
-          <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <span class="text-white text-lg font-bold text-center px-2">' . htmlspecialchars($category) . '</span>
-          </div>
-        </a>';
-      }
-      ?>
-    </div>
-  </section>
+          $title = htmlspecialchars($project['title']);
+          $description = htmlspecialchars($project['description']);
+          // Truncate description for preview
+          if (strlen($description) > 100) {
+            $description = substr($description, 0, 100) . '...';
+          }
+          $username = htmlspecialchars($project['username']);
+          $projectId = $project['id'];
+          $tags = explode(',', $project['tags']);
+        ?>
+          <a href="project_details.php?id=<?php echo $projectId; ?>" class="bg-white rounded-lg shadow-md overflow-hidden card-hover border border-[#bdc1ca]">
+            <img src="<?php echo $thumb; ?>" alt="<?php echo $title; ?>" class="w-full h-48 object-cover">
+            <div class="p-4">
+              <h3 class="text-lg font-semibold mb-2 text-[#171a1f]"><?php echo $title; ?></h3>
+              <p class="text-[#565d6d] text-sm mb-4"><?php echo $description; ?></p>
+              <div class="flex flex-wrap mb-2">
+                <?php foreach ($tags as $tag): ?>
+                  <?php if(trim($tag) !== ''): ?>
+                    <span class="mr-2 mb-2 px-3 py-1 bg-gray-100 rounded-full text-xs text-[#565d6d]"><?php echo htmlspecialchars(trim($tag)); ?></span>
+                  <?php endif; ?>
+                <?php endforeach; ?>
+              </div>
+              <p class="text-[#9095a1] text-xs">By <?php echo $username; ?></p>
+            </div>
+          </a>
+        <?php endforeach; ?>
+      </div>
+    <?php else: ?>
+      <div class="bg-gray-50 rounded-lg p-8 text-center">
+        <i class="fas fa-search text-4xl text-gray-400 mb-4"></i>
+        <h2 class="text-2xl font-archivo font-bold text-[#171a1f] mb-2">No projects found</h2>
+        <p class="text-[#565d6d] mb-6">We couldn't find any projects matching your search term.</p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+          <a href="projects.php" class="px-6 py-2 bg-white border border-[#bdc1ca] rounded-lg text-[#565d6d] shadow-sm">
+            Browse All Projects
+          </a>
+          <button onclick="document.getElementById('searchButton').click()" class="px-6 py-2 bg-[#A7D820] text-white rounded-lg shadow-md">
+            Try Another Search
+          </button>
+        </div>
+      </div>
+    <?php endif; ?>
+  </div>
 
   <script>
     // Search functionality
