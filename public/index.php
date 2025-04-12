@@ -14,8 +14,8 @@
         </div>
         <div class="space-x-6">
             <a href="#" class="font-semibold" style="color: #A7D820;">Home</a>
-            <a href="#" class="text-gray-600">Projects</a>
-            <a href="#" class="text-gray-600">Profile</a>
+            <a href="projects.php" class="text-gray-600">Projects</a>
+            <a href="profile.php" class="text-gray-600">Profile</a>
         </div>
         <div class="space-x-4">
             <button class="border px-4 py-2 rounded text-gray-600">Sign Up</button>
@@ -34,21 +34,26 @@
     <section class="max-w-6xl mx-auto my-12">
         <h2 class="text-2xl font-bold text-center mb-6">Popular Projects</h2>
         <div class="grid grid-cols-3 gap-6">
-            <div class="bg-white shadow-md p-4 rounded">
-                <img src="modular_home.jpg" class="rounded" alt="Eco Home">
-                <h3 class="text-lg font-semibold mt-2">Eco Home</h3>
-                <p class="text-gray-600">Sustainable design project focusing on renewable energy.</p>
-            </div>
-            <div class="bg-white shadow-md p-4 rounded">
-                <img src="smart_park.jpg" class="rounded" alt="Smart Park">
-                <h3 class="text-lg font-semibold mt-2">Smart Park</h3>
-                <p class="text-gray-600">Innovative park design integrating technology and nature.</p>
-            </div>
-            <div class="bg-white shadow-md p-4 rounded">
-                <img src="Tech-Hub.avif" class="rounded" alt="Tech Hub">
-                <h3 class="text-lg font-semibold mt-2">Tech Hub</h3>
-                <p class="text-gray-600">Collaborative workspace for cutting-edge tech development.</p>
-            </div>
+            <?php
+            require_once __DIR__ . "/../config/database.php";
+            // Fetch projects from the database
+            $stmt = $pdo->query("SELECT p.title, p.project_file, p.description, p.tags, u.username FROM projects p JOIN users u ON p.user_id = u.id LIMIT 3");
+            $projects = $stmt->fetchAll();
+            
+            foreach ($projects as $project) {
+                $filePath = "/gyaanuday/uploads/" . htmlspecialchars($project['project_file']);
+                $description = htmlspecialchars($project['description']);
+                $title = htmlspecialchars($project['title']);
+                $tags = htmlspecialchars($project['tags']);
+                echo "
+                <div class='bg-white shadow-md p-4 rounded'>
+                    <img src='$filePath' class='rounded' alt='$title'>
+                    <h3 class='text-lg font-semibold mt-2'>$title</h3>
+                    <p class='text-gray-600'>$description</p>
+                    <p class='text-gray-500 text-sm mt-2'>Tags: $tags</p>
+                </div>";
+            }
+            ?>
         </div>
     </section>
 

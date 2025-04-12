@@ -24,16 +24,20 @@
 
     <!-- Upload Section -->
     <div class="p-8 max-w-4xl mx-auto flex justify-between items-start">
-    <form class="w-1/2" action="/src/projects/add_project.php" method="POST" enctype="multipart/form-data">
+    <form class="w-1/2" action="/gyaanuday/src/projects/add_project.php" method="POST" enctype="multipart/form-data">
     <h2 class="text-2xl font-semibold">Showcase Your Projects</h2>
+    <input type="text" name="title" class="mt-4 w-full border p-2 rounded" placeholder="Project Title" required>
     <div class="mt-4 relative">
-        <input type="file" id="project-upload" name="project_file" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-10" required>
-        <label for="project-upload" class="text-white py-2 px-4 rounded flex items-center cursor-pointer" style="background-color: #A7D820;">⬆ Upload your project</label>
+        <input type="file" id="project-upload" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-10" name="project_file" required>
+        <label for="project-upload" class="text-white py-2 px-4 rounded flex items-center cursor-pointer" style="background-color: #A7D820;">
+            ⬆ Upload your project
+        </label>
     </div>
-    <input type="text" name="title" class="mt-4 w-full border p-2 rounded" placeholder="Project title" required>
     <textarea name="description" class="mt-4 w-full border p-2 rounded" placeholder="Project description" required></textarea>
-    <input type="text" name="tags" class="mt-2 w-full border p-2 rounded" placeholder="Enter tags (Press enter to add new tag)">
-    <button type="submit" class="mt-4 text-white py-2 px-4 rounded flex items-center" style="background-color: #A7D820;">Submit Project</button>
+    <input type="text" name="tags" class="mt-2 w-full border p-2 rounded" placeholder="Enter tags (Press enter to add new tag)" required>
+    <button type="submit" class="mt-4 text-white py-2 px-4 rounded flex items-center" style="background-color: #A7D820;">
+        Submit Project
+    </button>
 </form>
 
 

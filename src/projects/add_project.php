@@ -9,15 +9,16 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     }
 
     $userId = $_SESSION['user_id'];
+    $title = trim($_POST['title']); // Get the title
     $description = trim($_POST['description']);
     $tags = trim($_POST['tags']);
 
-    if (empty($description) || empty($tags) || empty($_FILES['project_file']['name'])) {
+    if (empty($title) || empty($description) || empty($tags) || empty($_FILES['project_file']['name'])) {
         die("All fields are required.");
     }
 
     // Handle file upload
-    $targetDir = __DIR__ . "/uploads/";
+    $targetDir = __DIR__ . "/../../uploads/";
     $fileName = basename($_FILES['project_file']['name']);
     $targetFile = $targetDir . $fileName;
 
@@ -27,6 +28,12 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     if (!in_array($fileType, $allowedTypes)) {
         die("Only JPG, PNG, JPEG, PDF, MP4, MP3 files are allowed.");
     }
+//     if (!is_uploaded_file($_FILES['project_file']['tmp_name'])) {
+//       die("File is not uploaded.");
+//   }
+//   if (!file_exists($targetDir)) {
+//     die("Upload directory does not exist.");
+// }
 
     // Move the uploaded file to the target directory
     if (!move_uploaded_file($_FILES['project_file']['tmp_name'], $targetFile)) {
@@ -34,10 +41,10 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     }
 
     // Insert project into the database
-    $stmt = $pdo->prepare("INSERT INTO projects (user_id, project_file, description, tags) VALUES (?, ?, ?, ?)");
+    $stmt = $pdo->prepare("INSERT INTO projects (user_id, title, project_file, description, tags) VALUES (?, ?, ?, ?, ?)");
     try {
-        $stmt->execute([$userId, $fileName, $description, $tags]);
-        header("Location: /public/index.php");
+        $stmt->execute([$userId, $title, $fileName, $description, $tags]);
+        header("Location: /gyaanuday/public/index.php");
         exit;
     } catch (\PDOException $e) {
         die("Project upload failed: " . $e->getMessage());
