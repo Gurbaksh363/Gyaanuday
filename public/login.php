@@ -261,12 +261,12 @@
         <section class="middle-section">
             <!-- Header -->
             <header>
-                <h2>Sign In</h2>
+                <h2>Log In</h2>
                 <p>Welcome back! Please login to your account</p>
             </header>
 
             <!-- Form -->
-            <form method="post" action="../src/auth/login.php">
+            <form method="post" action="../src/auth/process_login.php">
                 <div class="input-group">
                     <span>✉</span>
                     <input name="email" type="email" placeholder="Your email address" required>

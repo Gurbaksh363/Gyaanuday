@@ -65,30 +65,150 @@
               <button class="rounded-full p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
                 <i class="fas fa-bell"></i>
               </button>
-              <img src="https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/avatar.png" alt="Avatar" class="w-9 h-9 rounded-full cursor-pointer">
+              <img src="<?= htmlspecialchars($photo_url) ?>" alt="Avatar" class="w-9 h-9 rounded-full cursor-pointer object-cover border border-gray-200">
             </div>
           </div>
         </div>
     </nav>
 
+    <?php
+        // Start session and include database
+        session_start();
+        require_once __DIR__ . "/../config/database.php";
+        
+        // Redirect if not logged in
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: login.php");
+            exit;
+        }
+        
+        // Get user data
+        $user_id = $_SESSION['user_id'];
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+        $stmt->execute([$user_id]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        $profile_photo = $user['profile_photo'] ?? 'default-avatar.png';
+        
+        // Use consistent path handling with the upload path in update_profile.php
+        $photo_path = __DIR__ . "/../uploads/profile_photos/" . $profile_photo;
+        
+        // Use relative path for browser display
+        if (file_exists($photo_path) && $profile_photo) {
+            $photo_url = "../uploads/profile_photos/" . $profile_photo;
+        } else {
+            $photo_url = "https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/avatar.png";
+        }
+        
+        // Debug information - disable in production
+        $debug = false;
+    ?>
+
+    <!-- Show success/error messages -->
+    <?php if(isset($_SESSION['success'])): ?>
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4 max-w-4xl mx-auto mt-4" role="alert">
+            <span class="block sm:inline"><?= $_SESSION['success'] ?></span>
+            <?php unset($_SESSION['success']); ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if(isset($_SESSION['error'])): ?>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 max-w-4xl mx-auto mt-4" role="alert">
+            <span class="block sm:inline"><?= $_SESSION['error'] ?></span>
+            <?php unset($_SESSION['error']); ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if($debug): ?>
+        <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mb-4 max-w-4xl mx-auto mt-4">
+            <p>Debug Info:</p>
+            <p>Profile photo in DB: <?= htmlspecialchars($profile_photo) ?></p>
+            <p>Photo path (server): <?= htmlspecialchars($photo_path) ?></p>
+            <p>Photo URL (browser): <?= htmlspecialchars($photo_url) ?></p>
+            <p>Photo exists: <?= file_exists($photo_path) ? 'Yes' : 'No' ?></p>
+            <p>Document root: <?= htmlspecialchars($_SERVER['DOCUMENT_ROOT']) ?></p>
+        </div>
+    <?php endif; ?>
+
     <!-- User Profile Section -->
-    <div class="flex justify-center items-center min-h-screen bg-white">
-        <!-- Main container -->
-        <div class="w-full max-w-4xl bg-white border border-[#bdc1ca] flex items-center p-8 gap-6">
-            <!-- Avatar -->
-            <img src="https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/image.png" alt="User avatar" class="w-20 h-20 rounded-lg object-cover">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto bg-white border border-[#bdc1ca] p-8 rounded-lg mb-8">
+            <!-- User info container with avatar and bio -->
+            <div class="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8">
+                <div class="flex-shrink-0">
+                    <img src="<?= htmlspecialchars($photo_url) ?>" alt="User avatar" class="w-32 h-32 rounded-lg object-cover shadow-md">
+                </div>
+                
+                <div class="flex flex-col gap-4 flex-grow text-center md:text-left">
+                    <h1 class="text-[32px] leading-[48px] font-archivo text-[#171a1f]"><?= htmlspecialchars($user['username'] ?? 'User Name') ?></h1>
+                    <p class="text-base leading-[26px] text-[#565d6d] font-inter"><?= htmlspecialchars($user['bio'] ?? 'No bio available') ?></p>
+                </div>
+            </div>
             
-            <!-- User info container -->
-            <div class="flex flex-col gap-4">
-                <h1 class="text-[32px] leading-[48px] font-archivo text-[#171a1f]">User Name</h1>
-                <p class="text-base leading-[26px] text-[#565d6d] font-inter">This is the user bio that describes the user in a few sentences. It can include interests, profession, or any relevant information.</p>
+            <!-- Toggle for edit profile form -->
+            <div class="flex justify-center md:justify-start gap-4">
+                <button id="toggleEditForm" class="w-[150px] h-[44px] bg-[#a7d820] rounded-lg text-[#3a4b0b] font-inter text-base hover:bg-[#96c01c] transition-colors flex items-center justify-center gap-2">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </button>
+                <a href="/gyaanuday/src/auth/logout.php" class="w-[150px] h-[44px] bg-white border border-gray-300 rounded-lg text-[#565d6d] font-inter text-base hover:bg-gray-100 transition-colors flex items-center justify-center gap-2">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+            
+            <!-- Edit Profile Form (hidden by default) -->
+            <div id="editProfileForm" class="mt-8 hidden">
+                <div class="border-t border-gray-200 pt-8">
+                    <h2 class="text-2xl mb-6 font-archivo text-[#171a1f]">Update Your Profile</h2>
+                    
+                    <form action="../src/auth/update_profile.php" method="POST" enctype="multipart/form-data" class="space-y-6">
+                        <!-- Profile Picture Section -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                            <div class="flex flex-col items-center md:items-start">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Current Photo</label>
+                                <div class="w-24 h-24">
+                                    <img src="<?= htmlspecialchars($photo_url) ?>" class="w-full h-full rounded-lg object-cover border border-gray-200">
+                                </div>
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Upload New Photo</label>
+                                <div class="mt-1 flex items-center">
+                                    <label class="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none">
+                                        <span>Choose file</span>
+                                        <input type="file" name="profile_photo" accept="image/*" class="sr-only" id="profile_photo_input">
+                                    </label>
+                                    <span class="ml-3 text-sm text-gray-500" id="file_name_display">No file selected</span>
+                                </div>
+                                <p class="mt-1 text-xs text-gray-500">Recommended size: 400x400 pixels. JPG, PNG only.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Bio Section -->
+                        <div>
+                            <label for="bio" class="block text-sm font-medium text-gray-700 mb-2">Bio</label>
+                            <textarea 
+                                name="bio" 
+                                id="bio" 
+                                rows="4" 
+                                class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-[#a7d820] focus:border-[#a7d820] focus:outline-none transition" 
+                                placeholder="Tell us about yourself..."
+                            ><?= htmlspecialchars($user['bio'] ?? '') ?></textarea>
+                            <p class="mt-1 text-xs text-gray-500">Brief description that will appear on your profile.</p>
+                        </div>
+                        
+                        <!-- Buttons -->
+                        <div class="flex items-center justify-end space-x-3 pt-4">
+                            <button type="button" id="cancelEdit" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#a7d820]">
+                                Cancel
+                            </button>
+                            <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-[#3a4b0b] bg-[#a7d820] hover:bg-[#96c01c] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#a7d820]">
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-
-        <!-- Edit Profile Button -->
-        <button class="absolute bottom-10 w-[150px] h-[44px] bg-[#a7d820] rounded-lg text-[#3a4b0b] font-inter text-base hover:bg-[#96c01c] transition-colors">
-            Edit Profile
-        </button>
     </div>
 
     <!-- Uploaded Projects Section -->
@@ -233,5 +353,29 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Toggle edit profile form
+        document.getElementById('toggleEditForm').addEventListener('click', function() {
+            const form = document.getElementById('editProfileForm');
+            form.classList.toggle('hidden');
+            
+            // Scroll to the form when it's opened
+            if (!form.classList.contains('hidden')) {
+                form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+        
+        // Cancel button functionality
+        document.getElementById('cancelEdit').addEventListener('click', function() {
+            document.getElementById('editProfileForm').classList.add('hidden');
+        });
+        
+        // Show selected file name
+        document.getElementById('profile_photo_input').addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name || 'No file selected';
+            document.getElementById('file_name_display').textContent = fileName;
+        });
+    </script>
 </body>
 </html>
