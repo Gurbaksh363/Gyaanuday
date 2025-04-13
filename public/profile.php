@@ -101,62 +101,8 @@ $debug = false;
     </style>
 </head>
 <body class="bg-white">
-    <!-- Search Overlay -->
-    <div class="search-overlay" id="searchOverlay">
-      <div class="search-container">
-        <button class="absolute top-8 right-8 text-2xl text-gray-600 hover:text-gray-900" id="closeSearch">
-          <i class="fas fa-times"></i>
-        </button>
-        <h2 class="text-2xl font-archivo font-bold text-center mb-6">Search Projects</h2>
-        <form action="search_results.php" method="GET" class="flex flex-col gap-4">
-          <div class="relative">
-            <input 
-              type="text" 
-              name="q" 
-              placeholder="Search by title, tags..." 
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#A7D820] focus:border-transparent outline-none text-lg"
-              autocomplete="off"
-              required
-            >
-            <button type="submit" class="absolute right-3 top-3 text-gray-400 hover:text-[#A7D820]">
-              <i class="fas fa-search fa-lg"></i>
-            </button>
-          </div>
-          <p class="text-sm text-gray-500 text-center">Press Enter to search or ESC to close</p>
-        </form>
-      </div>
-    </div>
-
-    <!-- Improved Navigation Bar with notification icon removed -->
-    <nav class="bg-white shadow-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="flex justify-between h-16">
-            <div class="flex items-center">
-              <div class="flex-shrink-0 flex items-center">
-                <span class="text-2xl font-bold mr-1" style="color: #A7D820;"><i class="fas fa-project-diagram"></i></span>
-                <span class="text-[28px] leading-[42px] font-archivo ml-2">Gyaanuday</span>
-              </div>
-              <div class="ml-10 flex items-baseline space-x-4">
-                <a href="index.php" class="px-3 py-2 text-[14px] leading-[22px] text-[#565d6d] nav-item">
-                  <i class="fas fa-home mr-1"></i> Home
-                </a>
-                <a href="projects.php" class="px-3 py-2 text-[14px] leading-[22px] text-[#565d6d] nav-item">
-                  <i class="fas fa-folder-open mr-1"></i> Projects
-                </a>
-                <a href="profile.php" class="px-3 py-2 text-[14px] leading-[22px] font-semibold nav-item nav-item-active">
-                  <i class="fas fa-user mr-1"></i> Profile
-                </a>
-              </div>
-            </div>
-            <div class="flex items-center space-x-4">
-              <button id="searchButton" class="rounded-full p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
-                <i class="fas fa-search"></i>
-              </button>
-              <img src="<?= htmlspecialchars($photo_url) ?>" alt="Avatar" class="w-9 h-9 rounded-full cursor-pointer object-cover border border-gray-200">
-            </div>
-          </div>
-        </div>
-    </nav>
+    <!-- Include navigation -->
+    <?php include 'navigation.php'; ?>
 
     <!-- Show success/error messages -->
     <?php if(isset($_SESSION['success'])): ?>

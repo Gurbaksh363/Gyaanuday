@@ -1,3 +1,7 @@
+<?php
+session_start();
+require_once __DIR__ . "/../config/database.php";
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -96,71 +100,14 @@
 </head>
 
 <body class="bg-gray-50">
-  <!-- Search Overlay -->
-  <div class="search-overlay" id="searchOverlay">
-    <div class="search-container">
-      <button class="absolute top-8 right-8 text-2xl text-gray-600 hover:text-gray-900" id="closeSearch">
-        <i class="fas fa-times"></i>
-      </button>
-      <h2 class="text-2xl font-archivo font-bold text-center mb-6">Search Projects</h2>
-      <form action="search_results.php" method="GET" class="flex flex-col gap-4">
-        <div class="relative">
-          <input 
-            type="text" 
-            name="q" 
-            placeholder="Search by title, tags..." 
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#A7D820] focus:border-transparent outline-none text-lg"
-            autocomplete="off"
-            required
-          >
-          <button type="submit" class="absolute right-3 top-3 text-gray-400 hover:text-[#A7D820]">
-            <i class="fas fa-search fa-lg"></i>
-          </button>
-        </div>
-        <p class="text-sm text-gray-500 text-center">Press Enter to search or ESC to close</p>
-      </form>
-    </div>
-  </div>
-
-  <!-- Fixed Navigation Bar with notification icon removed -->
-  <nav class="bg-white shadow-md sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between h-16">
-        <div class="flex items-center">
-          <div class="flex-shrink-0 flex items-center">
-            <span class="text-2xl font-bold mr-1" style="color: #A7D820;"><i class="fas fa-project-diagram"></i></span>
-            <span class="text-[28px] leading-[42px] font-archivo ml-2">Gyaanuday</span>
-          </div>
-          <div class="ml-10 flex items-baseline space-x-4">
-            <a href="index.php" class="px-3 py-2 text-[14px] leading-[22px] font-semibold text-[#565d6d] nav-item">
-              <i class="fas fa-home mr-1"></i> Home
-            </a>
-            <a href="projects.php" class="px-3 py-2 text-[14px] leading-[22px] text-[#565d6d] nav-item">
-              <i class="fas fa-folder-open mr-1"></i> Projects
-            </a>
-            <a href="profile.php" class="px-3 py-2 text-[14px] leading-[22px] text-[#565d6d] nav-item">
-              <i class="fas fa-user mr-1"></i> Profile
-            </a>
-          </div>
-        </div>
-        <div class="flex items-center space-x-4">
-          <button id="searchButton" class="rounded-full p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
-            <i class="fas fa-search"></i>
-          </button>
-          <div class="flex space-x-3">
-            <a href="register.php" class="border border-gray-300 px-4 py-2 rounded text-[#565d6d] button-hover inline-block">Sign Up</a>
-            <a href="login.php" class="px-4 py-2 rounded text-white button-hover shadow-md inline-block" style="background-color: #A7D820;">Log In</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </nav>
+  <!-- Include navigation -->
+  <?php include 'navigation.php'; ?>
 
   <!-- Page Header -->
   <div class="bg-white shadow-sm">
     <div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-      <h1 class="text-3xl font-bold text-gray-900 font-archivo">Explore All Projects</h1>
-      <p class="mt-2 text-gray-600">Discover a world of creativity and innovation</p>
+      <h1 class="text-3xl font-bold text-gray-900 font-archivo">Discover Projects</h1>
+      <p class="mt-2 text-gray-600">Find inspiration from creative work shared by the community</p>
     </div>
   </div>
 
@@ -322,16 +269,16 @@
             <h3 class="text-lg font-semibold mb-3">Quick Links</h3>
             <ul class="space-y-2">
               <li><a href="index.php" class="text-gray-300 hover:text-white">Home</a></li>
-              <li><a href="projects.php" class="text-gray-300 hover:text-white">Projects</a></li>
-              <li><a href="#" class="text-gray-300 hover:text-white">About Us</a></li>
+              <li><a href="explore_projects.php" class="text-gray-300 hover:text-white">Explore</a></li>
+              <li><a href="about.php" class="text-gray-300 hover:text-white">About Us</a></li>
             </ul>
           </div>
           <div>
-            <h3 class="text-lg font-semibold mb-3">Connect</h3>
+            <h3 class="text-lg font-semibold mb-3">Account</h3>
             <ul class="space-y-2">
-              <li><a href="#" class="text-gray-300 hover:text-white">Contact Us</a></li>
-              <li><a href="#" class="text-gray-300 hover:text-white">FAQ</a></li>
-              <li><a href="#" class="text-gray-300 hover:text-white">Support</a></li>
+              <li><a href="login.php" class="text-gray-300 hover:text-white">Login</a></li>
+              <li><a href="register.php" class="text-gray-300 hover:text-white">Register</a></li>
+              <li><a href="profile.php" class="text-gray-300 hover:text-white">Profile</a></li>
             </ul>
           </div>
           <div>

@@ -1,10 +1,22 @@
+<?php
+session_start();
+require_once __DIR__ . "/../config/database.php";
+
+// Redirect if not logged in
+if (!isset($_SESSION['user_id'])) {
+  $_SESSION['error'] = "Please log in to upload projects.";
+  header("Location: login.php");
+  exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Projects | Gyaanuday</title>
+  <title>Upload Project | Gyaanuday</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <style>
@@ -150,38 +162,8 @@
     </div>
   </div>
 
-  <!-- Improved Navigation Bar with notification icon removed -->
-  <nav class="bg-white shadow-md sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between h-16">
-        <div class="flex items-center">
-          <div class="flex-shrink-0 flex items-center">
-            <span class="text-2xl font-bold mr-1" style="color: #A7D820;"><i class="fas fa-project-diagram"></i></span>
-            <span class="text-[28px] leading-[42px] font-archivo ml-2">Gyaanuday</span>
-          </div>
-          <div class="ml-10 flex items-baseline space-x-4">
-            <a href="index.php" class="px-3 py-2 text-[14px] leading-[22px] text-[#565d6d] nav-item">
-              <i class="fas fa-home mr-1"></i> Home
-            </a>
-            <a href="projects.php" class="px-3 py-2 text-[14px] leading-[22px] font-semibold nav-item nav-item-active">
-              <i class="fas fa-folder-open mr-1"></i> Projects
-            </a>
-            <a href="profile.php" class="px-3 py-2 text-[14px] leading-[22px] text-[#565d6d] nav-item">
-              <i class="fas fa-user mr-1"></i> Profile
-            </a>
-          </div>
-        </div>
-        <div class="flex items-center space-x-4">
-          <button id="searchButton" class="rounded-full p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
-            <i class="fas fa-search"></i>
-          </button>
-          <a href="profile.php" class="rounded-full p-1 text-gray-500 hover:text-gray-700 focus:outline-none">
-            <i class="fas fa-user-circle text-xl"></i>
-          </a>
-        </div>
-      </div>
-    </div>
-  </nav>
+  <!-- Include navigation -->
+  <?php include 'navigation.php'; ?>
 
   <!-- Improved Upload Section -->
   <div class="container mx-auto pt-10 pb-16">
@@ -189,7 +171,7 @@
       <div class="flex flex-col md:flex-row">
         <!-- Form section -->
         <div class="md:w-2/3 p-8">
-          <h2 class="text-[32px] leading-[48px] font-semibold text-[#171a1f] font-archivo mb-6">Showcase Your Projects
+          <h2 class="text-[32px] leading-[48px] font-semibold text-[#171a1f] font-archivo mb-6">Share Your Project
           </h2>
 
           <form action="/gyaanuday/src/projects/add_project.php" method="POST" enctype="multipart/form-data"

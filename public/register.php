@@ -266,7 +266,7 @@
             </header>
 
             <!-- Form -->
-            <form method="post" action="../src/auth/register.php">
+            <form method="post" action="../src/auth/process_register.php">
                 <div class="input-group">
                     <span>👤</span>
                     <input name="username" type="text" placeholder="Your username" required>

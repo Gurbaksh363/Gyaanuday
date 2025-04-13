@@ -25,7 +25,7 @@
     
     try{
       $stmt->execute([$username, $email, $hashedPassword]);
-      header("Location: /public/login.php");
+      header("Location: /gyaanuday/public/login.php");
       exit;
     }
     catch(\PDOException $e){
