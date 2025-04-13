@@ -12,6 +12,7 @@
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Archivo&display=swap');
     body {
       font-family: 'Inter', sans-serif;
+      background-color: #f9fafb;
     }
     h1, h2, h3 {
       font-family: 'Archivo', sans-serif;
@@ -45,13 +46,100 @@
     }
     .tag {
       background-color: #f3f4f6;
-      padding: 4px 10px;
-      border-radius: 16px;
+      padding: 8px 16px;
+      border-radius: 30px;
       font-size: 0.875rem;
       color: #565d6d;
       margin-right: 8px;
       display: inline-block;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      border: 1px solid #e5e7eb;
+    }
+    .tag:hover {
+      background-color: #A7D820;
+      color: white;
+      border-color: #A7D820;
+    }
+    /* Like button styles - Updated for better visibility */
+    .like-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background-color: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      color: #565d6d;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      position: relative;
+      top: auto;
+      right: auto;
+      width: auto;
+      height: auto;
+    }
+    .like-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+    }
+    .like-btn.liked {
+      color: white;
+      background-color: #ef4444;
+      border-color: #ef4444;
+    }
+    .like-count {
+      position: relative;
+      top: auto;
+      right: auto;
+      background: none;
+      color: inherit;
+      border-radius: 0;
+      min-width: auto;
+      height: auto;
+      font-size: 1rem;
+      font-weight: bold;
+      padding: 0;
+    }
+    .like-btn.liked .like-count {
+      color: white;
+    }
+    .card {
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+    .card:hover {
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+      transform: translateY(-3px);
+    }
+    .project-header {
+      position: relative;
+    }
+    .project-header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100px;
+      height: 5px;
+      background-color: #A7D820;
+      border-radius: 3px;
+    }
+    .project-meta-item {
+      display: flex;
+      align-items: center;
+      margin-right: 20px;
+      color: #6b7280;
+    }
+    .project-meta-item i {
+      margin-right: 6px;
+      color: #A7D820;
     }
     /* Search overlay styles */
     .search-overlay {
@@ -85,7 +173,7 @@
   </style>
 </head>
 
-<body class="bg-white">
+<body>
   <!-- Search Overlay -->
   <div class="search-overlay" id="searchOverlay">
     <div class="search-container">
@@ -198,18 +286,52 @@
   } else {
     $thumb = "/gyaanuday/assets/default_icon.png";
   }
+
+  // Get like count and check if user has liked this project
+  $likeCount = 0;
+  $hasLiked = false;
+
+  $stmt = $pdo->prepare("SELECT COUNT(*) FROM likes WHERE project_id = ?");
+  $stmt->execute([$projectId]);
+  $likeCount = $stmt->fetchColumn();
+
+  if (isset($_SESSION['user_id'])) {
+    $stmt = $pdo->prepare("SELECT id FROM likes WHERE user_id = ? AND project_id = ?");
+    $stmt->execute([$_SESSION['user_id'], $projectId]);
+    $hasLiked = $stmt->fetch() ? true : false;
+  }
   ?>
 
   <div class="max-w-6xl mx-auto my-12 px-4">
     <!-- Project Header -->
-    <div class="flex justify-between items-start mb-8">
-      <div>
-        <h1 class="text-[32px] leading-[48px] font-archivo font-bold text-[#171a1f]"><?php echo $title; ?></h1>
-        <p class="text-[#565d6d]">Uploaded by <span class="font-semibold"><?php echo $username; ?></span> on <?php echo $created; ?></p>
+    <div class="flex flex-wrap justify-between items-start mb-12 project-header pb-5">
+      <div class="w-full md:w-3/4 mb-4 md:mb-0">
+        <div class="flex items-center flex-wrap">
+          <h1 class="text-[36px] leading-[48px] font-archivo font-bold text-[#171a1f] mb-3 mr-4"><?php echo $title; ?></h1>
+          <!-- Like Button moved beside title -->
+          <button id="likeButton" class="like-btn my-3 <?php echo $hasLiked ? 'liked' : ''; ?>" data-project-id="<?php echo $projectId; ?>">
+            <i class="<?php echo $hasLiked ? 'fas' : 'far'; ?> fa-heart"></i>
+            <span class="like-count ml-1"><?php echo $likeCount; ?> <?php echo $likeCount == 1 ? 'like' : 'likes'; ?></span>
+          </button>
+        </div>
+        <div class="flex flex-wrap items-center text-[#565d6d] mb-4">
+          <div class="project-meta-item">
+            <i class="fas fa-user"></i>
+            <span><?php echo $username; ?></span>
+          </div>
+          <div class="project-meta-item">
+            <i class="fas fa-calendar"></i>
+            <span><?php echo $created; ?></span>
+          </div>
+          <div class="project-meta-item">
+            <i class="fas fa-file"></i>
+            <span class="uppercase"><?php echo $projectExt; ?></span>
+          </div>
+        </div>
       </div>
-      <div>
-        <a href="<?php echo $projectFile; ?>" download class="px-6 py-3 rounded text-white button-hover shadow-md inline-block" style="background-color: #A7D820;">
-          <i class="fas fa-download mr-2"></i> Download Project
+      <div class="w-full md:w-1/4 flex justify-center md:justify-end">
+        <a href="<?php echo $projectFile; ?>" download class="px-6 py-3 rounded-full text-white button-hover shadow-md inline-block bg-[#A7D820]">
+          <i class="fas fa-download mr-2"></i> Download
         </a>
       </div>
     </div>
@@ -218,13 +340,15 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <!-- Left Column - Thumbnail and Details -->
       <div class="lg:col-span-2">
-        <div class="rounded-lg overflow-hidden shadow-md mb-6">
+        <div class="rounded-lg overflow-hidden shadow-md mb-6 card">
           <img src="<?php echo $thumb; ?>" alt="<?php echo $title; ?>" class="w-full h-auto max-h-96 object-cover">
         </div>
         
-        <div class="bg-white shadow-md rounded-lg p-6 border border-[#bdc1ca]">
-          <h2 class="text-xl font-semibold mb-4 text-[#171a1f] font-archivo">Description</h2>
-          <p class="text-[#565d6d] text-[16px] leading-[26px]"><?php echo $description; ?></p>
+        <div class="bg-white rounded-lg p-6 border border-[#e5e7eb] card relative">
+          <!-- Remove the like button from here -->
+          
+          <h2 class="text-2xl font-bold mb-4 text-[#171a1f] font-archivo">Description</h2>
+          <p class="text-[#565d6d] text-[16px] leading-[26px] mb-6"><?php echo nl2br($description); ?></p>
           
           <!-- Project Content Preview Based on File Type -->
           <?php if (in_array($projectExt, ['jpg', 'jpeg', 'png', 'gif'])): ?>
@@ -250,28 +374,43 @@
       <!-- Right Column - Additional Info -->
       <div>
         <!-- Project Info Card -->
-        <div class="bg-white shadow-md rounded-lg p-6 border border-[#bdc1ca] mb-6">
-          <h2 class="text-xl font-semibold mb-4 text-[#171a1f] font-archivo">Project Info</h2>
-          <div class="space-y-4">
-            <div>
-              <h3 class="text-sm font-medium text-[#9095a1]">CREATED BY</h3>
-              <p class="text-[#171a1f]"><?php echo $username; ?></p>
+        <div class="bg-white rounded-lg p-6 border border-[#e5e7eb] mb-6 card">
+          <h2 class="text-xl font-semibold mb-4 text-[#171a1f] font-archivo border-b pb-3">Project Details</h2>
+          <div class="space-y-5 mt-4">
+            <div class="flex items-center">
+              <div class="bg-gray-100 rounded-full p-3 mr-3">
+                <i class="fas fa-user text-[#A7D820]"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-medium text-[#9095a1]">CREATED BY</h3>
+                <p class="text-[#171a1f] font-medium"><?php echo $username; ?></p>
+              </div>
             </div>
-            <div>
-              <h3 class="text-sm font-medium text-[#9095a1]">DATE UPLOADED</h3>
-              <p class="text-[#171a1f]"><?php echo $created; ?></p>
+            <div class="flex items-center">
+              <div class="bg-gray-100 rounded-full p-3 mr-3">
+                <i class="fas fa-calendar text-[#A7D820]"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-medium text-[#9095a1]">DATE UPLOADED</h3>
+                <p class="text-[#171a1f] font-medium"><?php echo $created; ?></p>
+              </div>
             </div>
-            <div>
-              <h3 class="text-sm font-medium text-[#9095a1]">FILE TYPE</h3>
-              <p class="text-[#171a1f] uppercase"><?php echo $projectExt; ?></p>
+            <div class="flex items-center">
+              <div class="bg-gray-100 rounded-full p-3 mr-3">
+                <i class="fas fa-file text-[#A7D820]"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-medium text-[#9095a1]">FILE TYPE</h3>
+                <p class="text-[#171a1f] font-medium uppercase"><?php echo $projectExt; ?></p>
+              </div>
             </div>
           </div>
         </div>
         
         <!-- Tags Card -->
-        <div class="bg-white shadow-md rounded-lg p-6 border border-[#bdc1ca]">
-          <h2 class="text-xl font-semibold mb-4 text-[#171a1f] font-archivo">Tags</h2>
-          <div>
+        <div class="bg-white rounded-lg p-6 border border-[#e5e7eb] card">
+          <h2 class="text-xl font-semibold mb-4 text-[#171a1f] font-archivo border-b pb-3">Tags</h2>
+          <div class="mt-4">
             <?php foreach ($tags as $tag): ?>
               <?php if(trim($tag) !== ''): ?>
                 <span class="tag"><?php echo htmlspecialchars(trim($tag)); ?></span>
@@ -311,6 +450,53 @@
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && searchOverlay.classList.contains('active')) {
         searchOverlay.classList.remove('active');
+      }
+    });
+
+    // Like functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const likeButton = document.getElementById('likeButton');
+      
+      if (likeButton) {
+        likeButton.addEventListener('click', function() {
+          const projectId = this.getAttribute('data-project-id');
+          
+          // Check if user is logged in
+          <?php if (!isset($_SESSION['user_id'])): ?>
+            alert('Please login to like this project');
+            return;
+          <?php endif; ?>
+          
+          // Send AJAX request to like/unlike
+          const formData = new FormData();
+          formData.append('project_id', projectId);
+          
+          fetch('/gyaanuday/src/projects/like_project.php', {
+            method: 'POST',
+            body: formData
+          })
+          .then(response => response.json())
+          .then(data => {
+            // Update like button appearance and count
+            const likeButton = document.getElementById('likeButton');
+            const likeCount = document.querySelector('.like-count');
+            
+            if (data.status === 'liked') {
+              likeButton.classList.add('liked');
+              likeButton.querySelector('i').classList.replace('far', 'fas');
+            } else {
+              likeButton.classList.remove('liked');
+              likeButton.querySelector('i').classList.replace('fas', 'far');
+            }
+            
+            // Update count with proper singular/plural form
+            const count = data.count;
+            likeCount.textContent = `${count} ${count == 1 ? 'like' : 'likes'}`;
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+        });
       }
     });
   </script>
