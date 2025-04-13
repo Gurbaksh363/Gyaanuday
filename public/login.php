@@ -208,7 +208,7 @@
                 <input name="password" type="password" placeholder="Enter your password" required>
             </div>
 
-            <button type="submit" class="btn-primary">Sign In</button>
+            <button type="submit" class="btn-primary">Log In</button>
         </form>
 
         <!-- Footer -->
