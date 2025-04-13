@@ -127,7 +127,7 @@ $debug = false;
       </div>
     </div>
 
-    <!-- Improved Navigation Bar -->
+    <!-- Improved Navigation Bar with notification icon removed -->
     <nav class="bg-white shadow-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex justify-between h-16">
@@ -151,9 +151,6 @@ $debug = false;
             <div class="flex items-center space-x-4">
               <button id="searchButton" class="rounded-full p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
                 <i class="fas fa-search"></i>
-              </button>
-              <button class="rounded-full p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
-                <i class="fas fa-bell"></i>
               </button>
               <img src="<?= htmlspecialchars($photo_url) ?>" alt="Avatar" class="w-9 h-9 rounded-full cursor-pointer object-cover border border-gray-200">
             </div>
