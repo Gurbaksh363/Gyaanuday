@@ -189,6 +189,8 @@ require_once __DIR__ . "/../config/database.php";
     <?php endif; ?>
   </div>
 
+  <?php include 'components/footer.php'; ?>
+
   <script>
     // Search functionality
     const searchButton = document.getElementById('searchButton');

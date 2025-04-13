@@ -307,6 +307,8 @@ if (!isset($_SESSION['user_id'])) {
     </div>
   </div>
 
+  <?php include 'components/footer.php'; ?>
+
   <!-- JavaScript for file input display -->
   <script>
     document.getElementById('project-upload').addEventListener('change', function (e) {

@@ -495,6 +495,8 @@ require_once __DIR__ . "/../config/database.php";
 
   </div>
 
+  <?php include 'components/footer.php'; ?>
+
   <!-- Add this script before closing body tag -->
   <script>
     // Search functionality

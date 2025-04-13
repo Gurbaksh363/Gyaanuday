@@ -359,6 +359,8 @@ $debug = false;
         </div>
     </div>
 
+    <?php include 'components/footer.php'; ?>
+
     <script>
         // Toggle edit profile form
         document.getElementById('toggleEditForm').addEventListener('click', function() {
