@@ -164,6 +164,20 @@ $debug = false;
                     <h2 class="text-2xl mb-6 font-archivo text-[#171a1f]">Update Your Profile</h2>
                     
                     <form action="../src/auth/update_profile.php" method="POST" enctype="multipart/form-data" class="space-y-6">
+                        <!-- Username field -->
+                        <div>
+                            <label for="username" class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                            <input 
+                                type="text" 
+                                name="username" 
+                                id="username" 
+                                value="<?= htmlspecialchars($user['username'] ?? '') ?>"
+                                class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-[#a7d820] focus:border-[#a7d820] focus:outline-none transition" 
+                                placeholder="Your username"
+                            >
+                            <p class="mt-1 text-xs text-gray-500">This name will be visible to other users.</p>
+                        </div>
+                        
                         <!-- Profile Picture Section -->
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
                             <div class="flex flex-col items-center md:items-start">

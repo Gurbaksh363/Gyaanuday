@@ -89,9 +89,8 @@ require_once __DIR__ . "/../config/database.php";
   <!-- Include navigation -->
   <?php include 'navigation.php'; ?>
 
-  <header class="relative w-full h-[60vh] bg-cover bg-center" style="background-image: url('discover_project.jpg');">
-    <div
-      class="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-start justify-center text-left text-white pl-16">
+  <header class="relative w-full h-[70vh] bg-cover" style="background-image: url('/gyaanuday/public/images/discover/discover.jpg'); background-position: center bottom;">
+    <div class="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-start justify-center text-left text-white pl-16">
       <h1 class="text-[32px] leading-[48px] font-archivo font-bold">Discover Projects</h1>
       <p class="mt-2 text-[16px] leading-[26px]">Unleash creativity through hands-on learning</p>
       <a href="explore_projects.php" class="mt-4 px-6 py-2 rounded text-white shadow-md button-hover" style="background-color: #A7D820;">Explore Projects</a>
@@ -129,12 +128,12 @@ require_once __DIR__ . "/../config/database.php";
 
         echo "
         <a href='project_details.php?id=$projectId' class='bg-white shadow-md rounded-lg p-4 border border-[#bdc1ca] card-hover'>
-          <div class='relative'>
-            <img src='$thumb' class='rounded-lg w-full h-48 object-cover' alt='$title'>
+          <div class='relative h-48 overflow-hidden'>
+            <img src='$thumb' class='rounded-lg w-full h-full object-cover' alt='$title'>
           </div>
-          <h3 class='text-lg font-semibold mt-2 text-[#171a1f]'>$title</h3>
-          <p class='text-[#565d6d] text-[16px] leading-[26px]'>$description</p>
-          <p class='text-[#9095a1] text-[14px] mt-2'>Tags: $tags</p>
+          <h3 class='text-lg font-semibold mt-2 text-[#171a1f] truncate'>" . $title . "</h3>
+          <p class='text-[#565d6d] text-[16px] leading-[26px] line-clamp-2 h-13 overflow-hidden'>" . $description . "</p>
+          <p class='text-[#9095a1] text-[14px] mt-2 truncate'>Tags: $tags</p>
         </a>";
       }
       ?>
@@ -147,23 +146,25 @@ require_once __DIR__ . "/../config/database.php";
       <?php
       // Define common categories with their images
       $popularCategories = [
-        'Web Development' => 'web_dev.webp',
-        'Mobile Apps' => 'mobile.jpg',
-        'Data Analysis' => 'data_anyl.jpg',
-        'UI/UX Design' => 'ui_ux.jpg',
-        'AI & ML' => 'ai.jpg',
-        'Blockchain' => 'block_chain.jpg',
-        'Game Development' => 'game_dev.jpg',
-        'Cybersecurity' => 'cyber_security.jpg',
-        'IoT Projects' => 'default_category.jpg',
-        'Cloud Computing' => 'default_category.jpg'
+        'Web Development' => '/gyaanuday/public/images/thumbnail/Web Development.jpg',
+        'Mobile Apps' => '/gyaanuday/public/images/thumbnail/Mobile Apps.jpg',
+        'Data Analysis' => '/gyaanuday/public/images/thumbnail/Data Analysis.jpg',
+        'UI/UX Design' => '/gyaanuday/public/images/thumbnail/UIUX Design.png',
+        'AI & ML' => '/gyaanuday/public/images/thumbnail/aiml.jpg',
+        'Blockchain' => '/gyaanuday/public/images/thumbnail/Blockchian.jpg',
+        'Game Development' => '/gyaanuday/public/images/thumbnail/Game Development.jpg',
+        'Cybersecurity' => '/gyaanuday/public/images/thumbnail/Cybersecurity.webp',
+        'IoT Projects' => '/gyaanuday/public/images/thumbnail/IoT Projects.jpg',
+        'Cloud Computing' => '/gyaanuday/public/images/thumbnail/Cloud Computing.jpg'
       ];
       
       // Display categories as clickable cards
       foreach ($popularCategories as $category => $image) {
         echo '
         <a href="search_results.php?q=' . urlencode($category) . '" class="relative rounded-lg overflow-hidden shadow-md h-32 card-hover">
-          <img src="' . $image . '" class="absolute inset-0 w-full h-full object-cover" alt="' . htmlspecialchars($category) . '">
+          <div class="absolute inset-0 w-full h-full">
+            <img src="' . $image . '" class="w-full h-full object-cover" alt="' . htmlspecialchars($category) . '">
+          </div>
           <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
             <span class="text-white text-lg font-bold text-center px-2">' . htmlspecialchars($category) . '</span>
           </div>
