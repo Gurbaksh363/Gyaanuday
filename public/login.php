@@ -21,67 +21,64 @@
         }
 
         body {
+            min-height: 100vh;
+            height: 100vh;
+            background: url('/gyaanuday/public/images/Signup/bg.png') no-repeat center center fixed;
+            background-size: cover;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            background: #fff;
-            padding-top: 70px;
-        }
-        
-        .button-hover {
-            transition: all 0.3s ease;
-        }
-        
-        .button-hover:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        .container {
-            display: flex;
-            width: 80%;
-            align-items: center;
-            justify-content: center;
-            max-width: 1000px;
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: #A7D820;
+            color: white;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            margin-top: 25px;
+        }
+
+        .btn-primary:hover {
+            background: #95c118;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
             background: white;
             border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .form-container {
-            flex: 1;
-            max-width: 400px;  
-            padding: 20px;
-            background: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-        }
-
-        /* Left & Right Side Image Background */
-        .left-section, .right-section {
-            flex: 1;
-            background: url('https://s3-alpha-sig.figma.com/img/6eb3/1312/da8ab2c0d96e3ae0487e6b00617da5ce?Expires=1742774400&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=qyQnGBFaEAFOAvsXwTnAnz2LY9cM5MpNvFO24X0NV0oIW76w2dwoxjr4pN9pH6dvpm413uX4u2nFpk-f8W0oDN8Hi9WiZ3Lk0YpbCDA1MEYHScff4S-0CNMsV-8hVqNZ~x6c8bqvAhWDJr~e1~sKP4CUiClnQpR2~sco0jQcQq3LKn-Yx~epM7Q~ucOGa0to7W4-MIVfPXZcqnJpY3FTiLVcTz4W9PNYoMBIu4xhW3bbFlh05vkFMfylna5tHtSgbnRmHu0eajyv9HbrZMizlxdhaoCFF3R7kQpSQX3wIXvzRVQ1UBEsGKPjqeDv-MX-SrBn-WTtLpx5aao666VGWQ__') no-repeat center/cover;
-            height: 100vh;
-        }
-        
-        .left-section img, .right-section img {
-            width: 300px;
-            height: 100vh; 
-            object-fit: cover; 
-        }
-
-        /* Middle Section (Form) */
-        .middle-section {
-            flex: 1.5;
-            padding: 200px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             text-align: center;
-            background: white;
+        }
+        
+        .logo {
+            font-family: 'Archivo', sans-serif;
+            font-size: 36px;
+            font-weight: bold;
+            color: #171a1f;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo i {
+            color: #A7D820;
+            margin-right: 12px;
+            font-size: 36px;
         }
 
         header h2 {
-            font-size: 32px;
+            font-size: 28px;
             margin-bottom: 10px;
             font-family: 'Archivo', sans-serif;
             color: #171a1f;
@@ -91,7 +88,7 @@
         header p {
             font-size: 16px;
             color: #565d6d;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             line-height: 26px;
         }
 
@@ -99,9 +96,9 @@
         form {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
             border: none;
-            outline: none; 
+            outline: none;
         }
 
         .input-group {
@@ -118,6 +115,13 @@
             border-color: #A7D820;
             box-shadow: 0 0 0 2px rgba(167, 216, 32, 0.2);
         }
+        
+        .input-group .icon {
+            color: #565d6d;
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
 
         .input-group input {
             width: 100%;
@@ -129,89 +133,10 @@
             line-height: 26px;
         }
 
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            font-size: 14px;
-        }
-
-        .checkbox-group input {
-            margin-right: 8px;
-        }
-
-        .btn-primary {
-            width: 100%;
-            padding: 12px;
-            background: #A7D820;
-            color: white;
-            font-size: 16px;
-            border: none;
-            cursor: pointer;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            background: #95c118;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-        
-        .divider {
-            margin: 20px 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: gray;
-            font-size: 14px;
-        }
-
-        .divider::before,
-        .divider::after {
-            content: "";
-            flex: 1;
-            height: 1px;
-            background: #ddd;
-            margin: 0 10px;
-        }
-
-        /* Social Login Buttons */
-        .social-login {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .social-btn {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            cursor: pointer;
-            border-radius: 8px;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        
-        .social-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        
-        .apple { background: #f8f8f8; color: black; }
-        .google { background: #ffdddd; color: red; }
-        .facebook { background: #ddeeff; color: blue; }
-
         /* Footer */
         footer {
-            margin-top: 15px;
+            margin-top: 30px;
             font-size: 14px;
-            padding-top: 30px;
         }
 
         footer a {
@@ -226,84 +151,70 @@
             text-decoration: underline;
         }
         
-        .logo-link {
+        .home-link {
             position: absolute;
             top: 20px;
             left: 20px;
             display: flex;
             align-items: center;
             text-decoration: none;
-            color: inherit;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 8px;
+            background-color: rgba(0,0,0,0.6);
+            transition: all 0.3s ease;
+            font-weight: 600;
         }
-
-        .logo-text {
-            font-family: 'Archivo', sans-serif;
-            font-size: 28px;
-            font-weight: bold;
-            margin-left: 8px;
-            color: #171a1f;
+        
+        .home-link:hover {
+            background-color: #A7D820;
+            color: white;
+        }
+        
+        .home-link i {
+            margin-right: 8px;
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
-    <!-- Simple logo link to go back to home -->
-    <a href="index.php" class="logo-link">
-        <i class="fas fa-project-diagram text-2xl" style="color: #A7D820;"></i>
-        <span class="logo-text">Gyaanuday</span>
+    <!-- Home link button -->
+    <a href="index.php" class="home-link">
+        <i class="fas fa-home"></i> Home
     </a>
 
-    <aside class="left-section">
-        <img src="https://s3-alpha-sig.figma.com/img/6eb3/1312/da8ab2c0d96e3ae0487e6b00617da5ce?Expires=1742774400&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=qyQnGBFaEAFOAvsXwTnAnz2LY9cM5MpNvFO24X0NV0oIW76w2dwoxjr4pN9pH6dvpm413uX4u2nFpk-f8W0oDN8Hi9WiZ3Lk0YpbCDA1MEYHScff4S-0CNMsV-8hVqNZ~x6c8bqvAhWDJr~e1~sKP4CUiClnQpR2~sco0jQcQq3LKn-Yx~epM7Q~ucOGa0to7W4-MIVfPXZcqnJpY3FTiLVcTz4W9PNYoMBIu4xhW3bbFlh05vkFMfylna5tHtSgbnRmHu0eajyv9HbrZMizlxdhaoCFF3R7kQpSQX3wIXvzRVQ1UBEsGKPjqeDv-MX-SrBn-WTtLpx5aao666VGWQ__" alt="Side Image">
-    </aside>
-    
-    <div class="container">
-        <!-- Middle Section (Form) -->
-        <section class="middle-section">
-            <!-- Header -->
-            <header>
-                <h2>Log In</h2>
-                <p>Welcome back! Please login to your account</p>
-            </header>
+    <div class="form-container">
+        <!-- Logo/Branding -->
+        <div class="logo">
+            <i class="fas fa-project-diagram"></i>
+            <span>Gyaanuday</span>
+        </div>
+        
+        <!-- Header -->
+        <header>
+            <h2>Log In</h2>
+            <p>Welcome back! Please login to your account</p>
+        </header>
 
-            <!-- Form -->
-            <form method="post" action="../src/auth/process_login.php">
-                <div class="input-group">
-                    <span>✉</span>
-                    <input name="email" type="email" placeholder="Your email address" required>
-                </div>
+        <!-- Form -->
+        <form method="post" action="../src/auth/process_login.php">
+            <div class="input-group">
+                <span class="icon"><i class="fas fa-envelope"></i></span>
+                <input name="email" type="email" placeholder="Your email address" required>
+            </div>
 
-                <div class="input-group">
-                    <span>⚿</span>
-                    <input name="password" type="password" placeholder="Enter your password" required>
-                </div>
+            <div class="input-group">
+                <span class="icon"><i class="fas fa-lock"></i></span>
+                <input name="password" type="password" placeholder="Enter your password" required>
+            </div>
 
-                <div class="checkbox-group">
-                    <input type="checkbox" id="remember">
-                    <label for="remember">Remember me</label>
-                </div>
+            <button type="submit" class="btn-primary">Sign In</button>
+        </form>
 
-                <button type="submit" class="btn-primary">Sign In</button>
-            </form>
-
-            <!-- Divider -->
-            <div class="divider">Or</div>
-
-            <!-- Social Login Buttons -->
-            <section class="social-login">
-                <button class="social-btn apple">🍏 Continue with Apple</button>
-                <button class="social-btn google"><b>G</b> Continue with Google</button>
-                <button class="social-btn facebook"><b>ⓕ</b> Continue with Facebook</button>
-            </section>
-
-            <!-- Footer -->
-            <footer>
-                <p>Don't have an account? <a href="register.php">Sign Up</a></p>
-            </footer>
-        </section>
+        <!-- Footer -->
+        <footer>
+            <p>Don't have an account? <a href="register.php">Sign Up</a></p>
+        </footer>
     </div>
-    
-    <aside class="right-section">
-        <img src="https://s3-alpha-sig.figma.com/img/6eb3/1312/da8ab2c0d96e3ae0487e6b00617da5ce?Expires=1742774400&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=qyQnGBFaEAFOAvsXwTnAnz2LY9cM5MpNvFO24X0NV0oIW76w2dwoxjr4pN9pH6dvpm413uX4u2nFpk-f8W0oDN8Hi9WiZ3Lk0YpbCDA1MEYHScff4S-0CNMsV-8hVqNZ~x6c8bqvAhWDJr~e1~sKP4CUiClnQpR2~sco0jQcQq3LKn-Yx~epM7Q~ucOGa0to7W4-MIVfPXZcqnJpY3FTiLVcTz4W9PNYoMBIu4xhW3bbFlh05vkFMfylna5tHtSgbnRmHu0eajyv9HbrZMizlxdhaoCFF3R7kQpSQX3wIXvzRVQ1UBEsGKPjqeDv-MX-SrBn-WTtLpx5aao666VGWQ__" alt="Side Image">
-    </aside>
 </body>
 </html>

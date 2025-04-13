@@ -100,7 +100,7 @@ require_once __DIR__ . "/../config/database.php";
           
           <h2 class="text-2xl font-semibold mb-4 font-archivo">Our Story</h2>
           <p class="text-gray-700 mb-6 leading-relaxed">
-            Started in 2023, Gyaanuday emerged from a simple idea: to create a platform where people could 
+            Started in 2025, Gyaanuday emerged from a simple idea: to create a platform where people could 
             showcase their creative projects and learn from one another. What began as a small community has 
             grown into a thriving ecosystem of creators spanning multiple disciplines and skill levels.
           </p>
