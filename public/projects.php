@@ -242,15 +242,11 @@ if (!isset($_SESSION['user_id'])) {
         <div class="md:w-1/3 bg-gray-50 p-8">
           <h3 class="text-lg font-semibold text-[#171a1f] mb-6">Project Inspiration</h3>
           <div class="gallery-preview grid grid-cols-2 gap-3">
-            <img src="h1.jpg" class="w-full h-24 object-cover rounded-lg shadow-sm">
-            <img src="h2.jpg" class="w-full h-24 object-cover rounded-lg shadow-sm">
-            <img src="h3.jpg" class="w-full h-24 object-cover rounded-lg shadow-sm">
-            <img src="h4.jpg" class="w-full h-24 object-cover rounded-lg shadow-sm">
-            <img src="h5.jpg" class="w-full h-24 object-cover rounded-lg shadow-sm">
-            <div
-              class="w-full h-24 bg-[#A7D820] bg-opacity-20 rounded-lg flex items-center justify-center text-[#A7D820]">
-              <i class="fas fa-plus text-2xl"></i>
-            </div>
+            <img src="/gyaanuday/public/images/uploadthumbnail/img1.png" class="w-full h-24 object-cover rounded-lg shadow-sm">
+            <img src="/gyaanuday/public/images/uploadthumbnail/img2.png" class="w-full h-24 object-cover rounded-lg shadow-sm">
+            <img src="/gyaanuday/public/images/uploadthumbnail/img3.png" class="w-full h-24 object-cover rounded-lg shadow-sm">
+            <img src="/gyaanuday/public/images/uploadthumbnail/img4.png" class="w-full h-24 object-cover rounded-lg shadow-sm">
+            <img src="/gyaanuday/public/images/uploadthumbnail/img6.png" class="w-full h-24 object-cover rounded-lg shadow-sm">
           </div>
           <div class="mt-6">
             <p class="text-sm text-gray-600 leading-relaxed">
@@ -268,54 +264,46 @@ if (!isset($_SESSION['user_id'])) {
     <h2 class="text-[32px] leading-[48px] font-semibold text-center text-[#171a1f] font-archivo mb-8">Featured Projects
     </h2>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div class="overflow-hidden rounded-lg shadow-lg border border-[#bdc1ca] card-hover">
-        <img src="SkylineView.jpg" class="w-full h-48 object-cover">
-        <div class="p-4">
-          <h3 class="text-lg font-semibold text-[#171a1f]">Skyline View</h3>
-          <p class="text-[#565d6d] text-[16px] leading-[26px]">Urban Oasis</p>
-          <p class="text-[#9095a1] text-[14px]">Architecture</p>
-        </div>
-      </div>
-      <div class="overflow-hidden rounded-lg shadow-lg border border-[#bdc1ca] card-hover">
-        <img src="CityofTomorrow.jpg" class="w-full h-48 object-cover">
-        <div class="p-4">
-          <h3 class="text-lg font-semibold text-[#171a1f]">City of Tomorrow</h3>
-          <p class="text-[#565d6d] text-sm">Futuristic Dreams</p>
-          <p class="text-[#9095a1] text-xs">Digital Art</p>
-        </div>
-      </div>
-      <div class="overflow-hidden rounded-lg shadow-lg border border-[#bdc1ca] card-hover">
-        <img src="ArtisanVase.jpg" class="w-full h-48 object-cover">
-        <div class="p-4">
-          <h3 class="text-lg font-semibold text-[#171a1f]">Artisan Vase</h3>
-          <p class="text-[#565d6d] text-sm">Pottery Passion</p>
-          <p class="text-[#9095a1] text-xs">Ceramics</p>
-        </div>
-      </div>
-      <div class="overflow-hidden rounded-lg shadow-lg border border-[#bdc1ca] card-hover">
-        <img src="Landscape.jpg" class="w-full h-48 object-cover">
-        <div class="p-4">
-          <h3 class="text-lg font-semibold text-[#171a1f]">Landscape Shot</h3>
-          <p class="text-[#565d6d] text-sm">Nature's Beauty</p>
-          <p class="text-[#9095a1] text-xs">Photography</p>
-        </div>
-      </div>
-      <div class="overflow-hidden rounded-lg shadow-lg border border-[#bdc1ca] card-hover">
-        <img src="Portrait.jpg" class="w-full h-48 object-cover">
-        <div class="p-4">
-          <h3 class="text-lg font-semibold text-[#171a1f]">Portrait Art</h3>
-          <p class="text-[#565d6d] text-sm">Masterful Strokes</p>
-          <p class="text-[#9095a1] text-xs">Fine Art</p>
-        </div>
-      </div>
-      <div class="overflow-hidden rounded-lg shadow-lg border border-[#bdc1ca] card-hover">
-        <img src="AppInterface.jpg" class="w-full h-48 object-cover">
-        <div class="p-4">
-          <h3 class="text-lg font-semibold text-[#171a1f]">App Interface</h3>
-          <p class="text-[#565d6d] text-sm">Tech Savvy</p>
-          <p class="text-[#9095a1] text-xs">UI/UX Design</p>
-        </div>
-      </div>
+      <?php
+      // Fetch 6 random projects from the database
+      $stmt = $pdo->query("SELECT p.id, p.title, p.description, p.tags, p.thumbnail, u.username 
+                          FROM projects p 
+                          JOIN users u ON p.user_id = u.id 
+                          ORDER BY RAND() 
+                          LIMIT 6");
+      $featured_projects = $stmt->fetchAll();
+
+      foreach ($featured_projects as $project) {
+        $projectId = $project['id'];
+        $fileName = htmlspecialchars($project['thumbnail']);
+        $filePath = "/gyaanuday/uploads/" . $fileName;
+        $title = htmlspecialchars($project['title']);
+        $shortDesc = htmlspecialchars(substr($project['description'], 0, 50) . (strlen($project['description']) > 50 ? '...' : ''));
+        $tags = !empty($project['tags']) ? explode(',', $project['tags'])[0] : 'Project';
+        
+        $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        
+        // Check if the file is an image
+        if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
+          $thumb = $filePath;
+        } else {
+          $thumb = "/gyaanuday/assets/default_icon.png"; // Default thumbnail
+        }
+        
+        echo '<div class="overflow-hidden rounded-lg shadow-lg border border-[#bdc1ca] card-hover">
+          <a href="project_details.php?id=' . $projectId . '">
+            <div class="w-full h-48 overflow-hidden">
+              <img src="' . $thumb . '" class="w-full h-full object-cover">
+            </div>
+            <div class="p-4">
+              <h3 class="text-lg font-semibold text-[#171a1f]">' . $title . '</h3>
+              <p class="text-[#565d6d] text-sm">' . $shortDesc . '</p>
+              <p class="text-[#9095a1] text-xs">' . $tags . '</p>
+            </div>
+          </a>
+        </div>';
+      }
+      ?>
     </div>
   </div>
 

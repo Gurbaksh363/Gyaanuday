@@ -293,7 +293,7 @@ require_once __DIR__ . "/../config/database.php";
         </div>
       </div>
       <div class="border-t border-gray-700 mt-8 pt-6 text-sm text-gray-400 text-center">
-        <p>&copy; 2023 Gyaanuday. All rights reserved.</p>
+        <p>&copy; 2025 Gyaanuday. All rights reserved.</p>
       </div>
     </div>
   </footer>

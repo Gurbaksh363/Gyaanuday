@@ -321,53 +321,6 @@ $debug = false;
         ?>
     </div>
 
-    <!-- Community Engagement Section -->
-    <div class="container mx-auto px-4 py-8">
-        <h1 class="text-4xl font-archivo text-center text-[#171a1f] mb-12">Community Engagement</h1>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Garden Project -->
-            <div class="bg-white rounded-md border border-[#bdc1ca] p-4">
-                <img src="https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/image-20-11.png" alt="Garden Project" class="w-full h-40 object-cover rounded-lg mb-6">
-                <h2 class="text-xl font-bold text-[#171a1f] mb-2">Garden Project</h2>
-                <p class="text-[#9095a1] mb-6">Join our community garden project and help beautify our neighborhood.</p>
-                <button class="w-full py-2 px-4 border border-[#5f7b12] text-[#5f7b12] rounded-md hover:bg-[#5f7b12] hover:text-white transition-colors">
-                    Engage
-                </button>
-            </div>
-
-            <!-- Art Mural -->
-            <div class="bg-white rounded-md border border-[#bdc1ca] p-4">
-                <img src="https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/image-20-12.png" alt="Art Mural" class="w-full h-40 object-cover rounded-lg mb-6">
-                <h2 class="text-xl font-bold text-[#171a1f] mb-2">Art Mural</h2>
-                <p class="text-[#9095a1] mb-6">Contribute to our community mural and express your creativity.</p>
-                <button class="w-full py-2 px-4 border border-[#5f7b12] text-[#5f7b12] rounded-md hover:bg-[#5f7b12] hover:text-white transition-colors">
-                    Engage
-                </button>
-            </div>
-
-            <!-- Beach Cleanup -->
-            <div class="bg-white rounded-md border border-[#bdc1ca] p-4">
-                <img src="https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/image-20-13.png" alt="Beach Cleanup" class="w-full h-40 object-cover rounded-lg mb-6">
-                <h2 class="text-xl font-bold text-[#171a1f] mb-2">Beach Cleanup</h2>
-                <p class="text-[#9095a1] mb-6">Join our beach cleanup and help keep our beaches clean.</p>
-                <button class="w-full py-2 px-4 border border-[#5f7b12] text-[#5f7b12] rounded-md hover:bg-[#5f7b12] hover:text-white transition-colors">
-                    Engage
-                </button>
-            </div>
-
-            <!-- Tree Planting -->
-            <div class="bg-white rounded-md border border-[#bdc1ca] p-4">
-                <img src="https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/image-20-14.png" alt="Tree Planting" class="w-full h-40 object-cover rounded-lg mb-6">
-                <h2 class="text-xl font-bold text-[#171a1f] mb-2">Tree Planting</h2>
-                <p class="text-[#9095a1] mb-6">Participate in our tree planting event to make our area greener.</p>
-                <button class="w-full py-2 px-4 border border-[#5f7b12] text-[#5f7b12] rounded-md hover:bg-[#5f7b12] hover:text-white transition-colors">
-                    Engage
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- Delete Account Modal -->
     <div id="deleteAccountModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
         <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
