@@ -68,7 +68,7 @@ session_start();
       border-color: #A7D820;
     }
     /* Like button styles - Updated for better visibility */
-    .like-btn {
+    .like-btn, .bookmark-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -88,7 +88,7 @@ session_start();
       width: auto;
       height: auto;
     }
-    .like-btn:hover {
+    .like-btn:hover, .bookmark-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 5px 10px rgba(0,0,0,0.15);
     }
@@ -97,7 +97,12 @@ session_start();
       background-color: #ef4444;
       border-color: #ef4444;
     }
-    .like-count {
+    .bookmark-btn.bookmarked {
+      color: white;
+      background-color: #3b82f6;
+      border-color: #3b82f6;
+    }
+    .like-count, .bookmark-count {
       position: relative;
       top: auto;
       right: auto;
@@ -110,7 +115,7 @@ session_start();
       font-weight: bold;
       padding: 0;
     }
-    .like-btn.liked .like-count {
+    .like-btn.liked .like-count, .bookmark-btn.bookmarked .bookmark-count {
       color: white;
     }
     .card {
@@ -311,6 +316,7 @@ session_start();
     // Get like count and check if user has liked this project
     $likeCount = 0;
     $hasLiked = false;
+    $hasBookmarked = false;
   
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM likes WHERE project_id = ?");
     $stmt->execute([$projectId]);
@@ -320,6 +326,11 @@ session_start();
       $stmt = $pdo->prepare("SELECT id FROM likes WHERE user_id = ? AND project_id = ?");
       $stmt->execute([$_SESSION['user_id'], $projectId]);
       $hasLiked = $stmt->fetch() ? true : false;
+      
+      // Check if user has bookmarked this project
+      $stmt = $pdo->prepare("SELECT id FROM bookmarks WHERE user_id = ? AND project_id = ?");
+      $stmt->execute([$_SESSION['user_id'], $projectId]);
+      $hasBookmarked = $stmt->fetch() ? true : false;
     }
   
     // Fetch project comments - now including profile_photo
@@ -351,11 +362,17 @@ session_start();
       <div class="w-full md:w-3/4 mb-4 md:mb-0">
         <div class="flex items-center flex-wrap">
           <h1 class="text-[36px] leading-[48px] font-archivo font-bold text-[#171a1f] mb-3 mr-4"><?php echo $title; ?></h1>
-          <!-- Like Button moved beside title -->
-          <button id="likeButton" class="like-btn my-3 <?php echo $hasLiked ? 'liked' : ''; ?>" data-project-id="<?php echo $projectId; ?>">
-            <i class="<?php echo $hasLiked ? 'fas' : 'far'; ?> fa-heart"></i>
-            <span class="like-count ml-1"><?php echo $likeCount; ?> <?php echo $likeCount == 1 ? 'like' : 'likes'; ?></span>
-          </button>
+          <!-- Like and Bookmark Buttons beside title -->
+          <div class="flex gap-2 items-center my-3">
+            <button id="likeButton" class="like-btn <?php echo $hasLiked ? 'liked' : ''; ?>" data-project-id="<?php echo $projectId; ?>">
+              <i class="<?php echo $hasLiked ? 'fas' : 'far'; ?> fa-heart"></i>
+              <span class="like-count ml-1"><?php echo $likeCount; ?> <?php echo $likeCount == 1 ? 'like' : 'likes'; ?></span>
+            </button>
+            <button id="bookmarkButton" class="bookmark-btn <?php echo $hasBookmarked ? 'bookmarked' : ''; ?>" data-project-id="<?php echo $projectId; ?>">
+              <i class="<?php echo $hasBookmarked ? 'fas' : 'far'; ?> fa-bookmark"></i>
+              <span class="bookmark-count ml-1"><?php echo $hasBookmarked ? 'Saved' : 'Save'; ?></span>
+            </button>
+          </div>
         </div>
         <div class="flex flex-wrap items-center text-[#565d6d] mb-4">
           <div class="project-meta-item">
@@ -568,6 +585,7 @@ session_start();
     // Like functionality
     document.addEventListener('DOMContentLoaded', function() {
       const likeButton = document.getElementById('likeButton');
+      const bookmarkButton = document.getElementById('bookmarkButton');
       
       if (likeButton) {
         likeButton.addEventListener('click', function() {
@@ -604,6 +622,47 @@ session_start();
             // Update count with proper singular/plural form
             const count = data.count;
             likeCount.textContent = `${count} ${count == 1 ? 'like' : 'likes'}`;
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+        });
+      }
+      
+      // Bookmark functionality
+      if (bookmarkButton) {
+        bookmarkButton.addEventListener('click', function() {
+          const projectId = this.getAttribute('data-project-id');
+          
+          // Check if user is logged in
+          <?php if (!isset($_SESSION['user_id'])): ?>
+            alert('Please login to bookmark this project');
+            return;
+          <?php endif; ?>
+          
+          // Send AJAX request to bookmark/unbookmark
+          const formData = new FormData();
+          formData.append('project_id', projectId);
+          
+          fetch('/gyaanuday/src/projects/bookmark_project.php', {
+            method: 'POST',
+            body: formData
+          })
+          .then(response => response.json())
+          .then(data => {
+            // Update bookmark button appearance
+            const bookmarkButton = document.getElementById('bookmarkButton');
+            const bookmarkCount = document.querySelector('.bookmark-count');
+            
+            if (data.status === 'bookmarked') {
+              bookmarkButton.classList.add('bookmarked');
+              bookmarkButton.querySelector('i').classList.replace('far', 'fas');
+              bookmarkCount.textContent = 'Saved';
+            } else {
+              bookmarkButton.classList.remove('bookmarked');
+              bookmarkButton.querySelector('i').classList.replace('fas', 'far');
+              bookmarkCount.textContent = 'Save';
+            }
           })
           .catch(error => {
             console.error('Error:', error);

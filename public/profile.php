@@ -203,13 +203,16 @@ $debug = false;
             </div>
             
             <!-- Toggle for edit profile form -->
-            <div class="flex justify-center md:justify-start gap-4">
+            <div class="flex flex-wrap justify-center md:justify-start gap-4">
                 <button id="toggleEditForm" class="w-[150px] h-[44px] bg-[#a7d820] rounded-lg text-[#3a4b0b] font-inter text-base hover:bg-[#96c01c] transition-colors flex items-center justify-center gap-2">
                     <i class="fas fa-edit"></i> Edit Profile
                 </button>
                 <a href="/gyaanuday/src/auth/logout.php" class="w-[150px] h-[44px] bg-white border border-gray-300 rounded-lg text-[#565d6d] font-inter text-base hover:bg-gray-100 transition-colors flex items-center justify-center gap-2">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </a>
+                <button id="deleteAccountBtn" class="w-[200px] h-[44px] bg-white border border-red-500 rounded-lg text-red-500 font-inter text-base hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center gap-2">
+                    <i class="fas fa-user-slash"></i> Delete Account
+                </button>
             </div>
             
             <!-- Edit Profile Form (hidden by default) -->
@@ -292,9 +295,8 @@ $debug = false;
                         <p class="text-[#9095a1] text-sm mb-2">' . htmlspecialchars($project['short_description'] ?? '') . '</p>
                         <p class="text-[#9095a1] text-sm mb-4">' . htmlspecialchars($project['description']) . '</p>
                     </div>
-                    <div class="flex gap-2">
-                        <button class="flex-1 border border-[#5f7b12] text-[#5f7b12] py-2 rounded-md hover:bg-[#5f7b12] hover:text-white transition-colors">Like</button>
-                        <button class="flex-1 border border-[#d32f2f] text-[#d32f2f] py-2 rounded-md hover:bg-[#d32f2f] hover:text-white transition-colors delete-project" data-project-id="' . $project['id'] . '">Delete</button>
+                    <div class="flex justify-end">
+                        <button class="border border-[#d32f2f] text-[#d32f2f] py-2 px-4 rounded-md hover:bg-[#d32f2f] hover:text-white transition-colors delete-project" data-project-id="' . $project['id'] . '">Delete</button>
                     </div>
                 </div>';
             }
@@ -309,38 +311,57 @@ $debug = false;
     </div>
 
     <!-- Bookmarked Projects Section -->
-    <div class="container mx-auto px-4 py-8">
+    <div class="container mx-auto px-4 py-8" id="bookmarkedProjectsSection">
         <h1 class="text-center text-[32px] text-[#171a1f] font-archivo mb-12 leading-[48px]">Bookmarked Projects</h1>
         
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- TaskMaster Pro -->
-            <div class="bg-white rounded-md border border-[#bdc1ca] p-4 hover:shadow-lg transition-shadow">
-                <img src="https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/image-20-7.png" alt="TaskMaster Pro" class="w-full h-40 object-cover rounded-lg mb-4">
-                <h2 class="text-[#171a1f] text-lg font-bold mb-2">TaskMaster Pro</h2>
-                <p class="text-[#9095a1] text-sm leading-[22px]">A sleek web application for managing tasks efficiently.</p>
-            </div>
-
-            <!-- ShopEase -->
-            <div class="bg-white rounded-md border border-[#bdc1ca] p-4 hover:shadow-lg transition-shadow">
-                <img src="https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/image-20-8.png" alt="ShopEase" class="w-full h-40 object-cover rounded-lg mb-4">
-                <h2 class="text-[#171a1f] text-lg font-bold mb-2">ShopEase</h2>
-                <p class="text-[#9095a1] text-sm leading-[22px]">An intuitive online store with a variety of products.</p>
-            </div>
-
-            <!-- EduPath -->
-            <div class="bg-white rounded-md border border-[#bdc1ca] p-4 hover:shadow-lg transition-shadow">
-                <img src="https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/image-20-9.png" alt="EduPath" class="w-full h-40 object-cover rounded-lg mb-4">
-                <h2 class="text-[#171a1f] text-lg font-bold mb-2">EduPath</h2>
-                <p class="text-[#9095a1] text-sm leading-[22px]">Learn new skills with our comprehensive courses.</p>
-            </div>
-
-            <!-- PetConnect -->
-            <div class="bg-white rounded-md border border-[#bdc1ca] p-4 hover:shadow-lg transition-shadow">
-                <img src="https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/image-20-10.png" alt="PetConnect" class="w-full h-40 object-cover rounded-lg mb-4">
-                <h2 class="text-[#171a1f] text-lg font-bold mb-2">PetConnect</h2>
-                <p class="text-[#9095a1] text-sm leading-[22px]">Connect with fellow pet enthusiasts around the world.</p>
-            </div>
-        </div>
+        <?php
+        // Fetch user's bookmarked projects
+        $stmt = $pdo->prepare("
+            SELECT p.*, u.username, b.id as bookmark_id
+            FROM bookmarks b
+            JOIN projects p ON b.project_id = p.id
+            JOIN users u ON p.user_id = u.id
+            WHERE b.user_id = ?
+            ORDER BY b.created_at DESC
+        ");
+        $stmt->execute([$user_id]);
+        $bookmarked_projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        if (count($bookmarked_projects) > 0) {
+            echo '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="bookmarksGrid">';
+            
+            foreach ($bookmarked_projects as $project) {
+                // Set default image if none available
+                $projectImage = !empty($project['thumbnail']) ? "/gyaanuday/uploads/". htmlspecialchars($project['thumbnail']) : "https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/image-20.png";
+                
+                echo '<div class="bg-white rounded-md border border-[#bdc1ca] p-4 hover:shadow-lg transition-shadow flex flex-col">
+                    <div class="cursor-pointer project-card flex-grow" data-project-id="' . $project['id'] . '">
+                        <img src="' . $projectImage . '" alt="' . htmlspecialchars($project['title']) . '" class="w-full h-40 object-cover rounded-lg mb-4">
+                        <h2 class="text-[#171a1f] text-lg font-bold mb-2">' . htmlspecialchars($project['title']) . '</h2>
+                        <div class="flex items-center text-[#9095a1] text-xs mb-2">
+                            <i class="fas fa-user mr-1"></i>
+                            <span>' . htmlspecialchars($project['username']) . '</span>
+                        </div>
+                        <div class="description-container overflow-hidden" style="max-height: 80px;">
+                            <p class="text-[#9095a1] text-sm leading-[22px]">' . htmlspecialchars(substr($project['description'], 0, 100) . '...') . '</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-end mt-4 pt-2 border-t border-gray-100">
+                        <button class="bookmark-remove border border-[#f97316] text-[#f97316] py-2 px-4 rounded-md hover:bg-[#f97316] hover:text-white transition-colors" data-bookmark-id="' . $project['bookmark_id'] . '">
+                            <i class="fas fa-bookmark-slash mr-1"></i> Remove
+                        </button>
+                    </div>
+                </div>';
+            }
+            
+            echo '</div>';
+        } else {
+            echo '<div class="text-center py-8 text-gray-500" id="noBookmarksMessage">
+                <p>You haven\'t bookmarked any projects yet.</p>
+                <a href="projects.php" class="text-[#A7D820] hover:underline mt-2 inline-block">Browse Projects</a>
+            </div>';
+        }
+        ?>
     </div>
 
     <!-- Community Engagement Section -->
@@ -390,6 +411,44 @@ $debug = false;
         </div>
     </div>
 
+    <!-- Delete Account Modal -->
+    <div id="deleteAccountModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <h2 class="text-2xl font-bold text-red-600 mb-4">Delete Account</h2>
+            <p class="mb-6 text-gray-700">Are you sure you want to permanently delete your account? This action cannot be undone and all your data, projects, and activities will be removed.</p>
+            
+            <form action="../src/auth/delete_account.php" method="POST" class="space-y-4">
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Confirm with your password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                        placeholder="Enter your password"
+                    >
+                </div>
+                
+                <div class="flex space-x-3 pt-4">
+                    <button 
+                        type="button" 
+                        id="cancelDelete" 
+                        class="flex-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        type="submit" 
+                        class="flex-1 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    >
+                        Delete Permanently
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Toggle edit profile form
         document.getElementById('toggleEditForm').addEventListener('click', function() {
@@ -431,6 +490,72 @@ $debug = false;
             });
         });
 
+        // Remove bookmark functionality
+        document.querySelectorAll('.bookmark-remove').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent triggering the parent card click
+                const bookmarkId = this.getAttribute('data-bookmark-id');
+                const bookmarkCard = this.closest('.bg-white');
+                
+                if (confirm('Are you sure you want to remove this bookmark?')) {
+                    // Send AJAX request to remove bookmark
+                    const formData = new FormData();
+                    formData.append('bookmark_id', bookmarkId);
+                    
+                    fetch('/gyaanuday/src/projects/remove_bookmark.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Remove the project card from the DOM
+                            bookmarkCard.remove();
+                            
+                            // If no more bookmarks, show the empty message
+                            const bookmarksGrid = document.getElementById('bookmarksGrid');
+                            if (!bookmarksGrid || bookmarksGrid.children.length === 0) {
+                                const bookmarkedSection = document.getElementById('bookmarkedProjectsSection');
+                                bookmarkedSection.innerHTML = `
+                                    <h1 class="text-center text-[32px] text-[#171a1f] font-archivo mb-12 leading-[48px]">Bookmarked Projects</h1>
+                                    <div class="text-center py-8 text-gray-500" id="noBookmarksMessage">
+                                        <p>You haven't bookmarked any projects yet.</p>
+                                        <a href="projects.php" class="text-[#A7D820] hover:underline mt-2 inline-block">Browse Projects</a>
+                                    </div>
+                                `;
+                            }
+                        } else {
+                            alert('Failed to remove bookmark: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred. Please try again.');
+                    });
+                }
+            });
+        });
+
+        // Delete account modal functionality
+        const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+        const deleteAccountModal = document.getElementById('deleteAccountModal');
+        const cancelDelete = document.getElementById('cancelDelete');
+        
+        deleteAccountBtn.addEventListener('click', function() {
+            deleteAccountModal.classList.remove('hidden');
+        });
+        
+        cancelDelete.addEventListener('click', function() {
+            deleteAccountModal.classList.add('hidden');
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target === deleteAccountModal) {
+                deleteAccountModal.classList.add('hidden');
+            }
+        });
+        
         // Search functionality
         const searchButton = document.getElementById('searchButton');
         const searchOverlay = document.getElementById('searchOverlay');
