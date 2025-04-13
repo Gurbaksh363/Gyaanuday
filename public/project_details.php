@@ -1,4 +1,9 @@
-<?php session_start(); ?>
+<?php
+// At the very beginning of the file, add error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -170,6 +175,20 @@
       transform: translateY(0);
       opacity: 1;
     }
+    /* Profile photo styles */
+    .profile-img {
+      border: 2px solid #A7D820;
+      transition: all 0.3s ease;
+    }
+   
+    .profile-initial {
+      border: 2px solid #95c41f;
+      transition: all 0.3s ease;
+    }
+    .profile-initial:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 10px rgba(167, 216, 32, 0.3);
+    }
   </style>
 </head>
 
@@ -249,56 +268,80 @@
   // Connect to database and fetch project details
   require_once __DIR__ . "/../config/database.php";
   
-  $stmt = $pdo->prepare("SELECT p.*, u.username FROM projects p JOIN users u ON p.user_id = u.id WHERE p.id = ?");
-  $stmt->execute([$projectId]);
-  $project = $stmt->fetch();
+  try {
+    // Fetch project details
+    $stmt = $pdo->prepare("SELECT p.*, u.username FROM projects p JOIN users u ON p.user_id = u.id WHERE p.id = ?");
+    $stmt->execute([$projectId]);
+    $project = $stmt->fetch();
+    
+    if (!$project) {
+      echo '<div class="max-w-6xl mx-auto my-12 px-4">
+              <div class="bg-red-100 p-6 rounded-lg">
+                <h1 class="text-2xl font-bold text-red-700">Project not found</h1>
+                <p class="mt-2">The project you are looking for does not exist.</p>
+                <a href="projects.php" class="mt-4 inline-block px-6 py-2 text-white rounded" style="background-color: #A7D820;">
+                  Browse Projects
+                </a>
+              </div>
+            </div>';
+      exit;
+    }
   
-  if (!$project) {
+    // Prepare data for display
+    $title = htmlspecialchars($project['title']);
+    $description = htmlspecialchars($project['description']);
+    $username = htmlspecialchars($project['username']);
+    $created = date('F j, Y', strtotime($project['created_at']));
+    $tags = $project['tags'] ? explode(',', $project['tags']) : [];
+  
+    // Get file path
+    $fileName = htmlspecialchars($project['thumbnail'] ?? '');
+    $filePath = "/gyaanuday/uploads/" . $fileName;
+    $projectFile = "/gyaanuday/uploads/" . htmlspecialchars($project['project_file'] ?? '');
+    
+    $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+    $projectExt = strtolower(pathinfo($project['project_file'] ?? '', PATHINFO_EXTENSION));
+  
+    if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
+      $thumb = $filePath;
+    } else {
+      $thumb = "/gyaanuday/assets/default_icon.png";
+    }
+  
+    // Get like count and check if user has liked this project
+    $likeCount = 0;
+    $hasLiked = false;
+  
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM likes WHERE project_id = ?");
+    $stmt->execute([$projectId]);
+    $likeCount = $stmt->fetchColumn();
+  
+    if (isset($_SESSION['user_id'])) {
+      $stmt = $pdo->prepare("SELECT id FROM likes WHERE user_id = ? AND project_id = ?");
+      $stmt->execute([$_SESSION['user_id'], $projectId]);
+      $hasLiked = $stmt->fetch() ? true : false;
+    }
+  
+    // Fetch project comments - now including profile_photo
+    $comments = [];
+    $stmt = $pdo->prepare("
+      SELECT c.*, u.username, u.profile_photo
+      FROM comments c 
+      JOIN users u ON c.user_id = u.id 
+      WHERE c.project_id = ? 
+      ORDER BY c.created_at DESC
+    ");
+    $stmt->execute([$projectId]);
+    $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+  } catch (Exception $e) {
     echo '<div class="max-w-6xl mx-auto my-12 px-4">
             <div class="bg-red-100 p-6 rounded-lg">
-              <h1 class="text-2xl font-bold text-red-700">Project not found</h1>
-              <p class="mt-2">The project you are looking for does not exist.</p>
-              <a href="projects.php" class="mt-4 inline-block px-6 py-2 text-white rounded" style="background-color: #A7D820;">
-                Browse Projects
-              </a>
+              <h1 class="text-2xl font-bold text-red-700">Error</h1>
+              <p class="mt-2">An error occurred while retrieving project data.</p>
+              <p class="text-sm text-red-700">' . $e->getMessage() . '</p>
             </div>
           </div>';
     exit;
-  }
-
-  // Prepare data for display
-  $title = htmlspecialchars($project['title']);
-  $description = htmlspecialchars($project['description']);
-  $username = htmlspecialchars($project['username']);
-  $created = date('F j, Y', strtotime($project['created_at']));
-  $tags = explode(',', $project['tags']);
-
-  // Get file path
-  $fileName = htmlspecialchars($project['thumbnail']);
-  $filePath = "/gyaanuday/uploads/" . $fileName;
-  $projectFile = "/gyaanuday/uploads/" . htmlspecialchars($project['project_file']);
-  
-  $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-  $projectExt = strtolower(pathinfo($project['project_file'], PATHINFO_EXTENSION));
-
-  if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
-    $thumb = $filePath;
-  } else {
-    $thumb = "/gyaanuday/assets/default_icon.png";
-  }
-
-  // Get like count and check if user has liked this project
-  $likeCount = 0;
-  $hasLiked = false;
-
-  $stmt = $pdo->prepare("SELECT COUNT(*) FROM likes WHERE project_id = ?");
-  $stmt->execute([$projectId]);
-  $likeCount = $stmt->fetchColumn();
-
-  if (isset($_SESSION['user_id'])) {
-    $stmt = $pdo->prepare("SELECT id FROM likes WHERE user_id = ? AND project_id = ?");
-    $stmt->execute([$_SESSION['user_id'], $projectId]);
-    $hasLiked = $stmt->fetch() ? true : false;
   }
   ?>
 
@@ -423,7 +466,76 @@
       </div>
     </div>
 
-    <!-- Comment Section - Could be implemented in the future -->
+    <!-- Comment Section -->
+    <div class="mt-12">
+      <h2 class="text-2xl font-bold mb-6 text-[#171a1f] font-archivo border-b pb-3">Comments</h2>
+      
+      <!-- Comment Form -->
+      <div class="bg-white rounded-lg p-6 border border-[#e5e7eb] card mb-6">
+        <?php if (isset($_SESSION['user_id'])): ?>
+          <form id="commentForm" class="space-y-4">
+            <input type="hidden" name="project_id" value="<?php echo $projectId; ?>">
+            <div>
+              <label for="comment" class="block text-sm font-medium text-gray-700 mb-1">Add a comment</label>
+              <textarea 
+                id="comment" 
+                name="comment" 
+                rows="3" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#A7D820] focus:border-[#A7D820]"
+                placeholder="Share your thoughts on this project..."
+                required
+              ></textarea>
+            </div>
+            <div class="flex justify-end">
+              <button 
+                type="submit" 
+                class="px-4 py-2 bg-[#A7D820] text-white rounded-md hover:bg-[#95c41f] focus:outline-none focus:ring-2 focus:ring-[#A7D820] focus:ring-offset-2 transition-all button-hover"
+              >
+                Post Comment
+              </button>
+            </div>
+          </form>
+        <?php else: ?>
+          <div class="bg-gray-50 p-4 rounded-md text-center">
+            <p class="text-gray-600 mb-2">Please <a href="login.php" class="text-[#A7D820] font-bold">login</a> to leave a comment.</p>
+          </div>
+        <?php endif; ?>
+      </div>
+      
+      <!-- Comments List -->
+     <!-- Comments List -->
+<div class="space-y-4" id="commentsContainer">
+  <?php if (count($comments) > 0): ?>
+    <?php foreach ($comments as $comment): ?>
+      <div class="bg-white rounded-lg p-6 border border-[#e5e7eb] card">
+        <div class="flex items-start space-x-4">
+          <div class="flex-shrink-0">
+            <?php if (!empty($comment['profile_photo'])): ?>
+              <img class="h-12 w-12 rounded-full object-cover profile-img" 
+                   src="/gyaanuday/uploads/profile_photos/<?php echo htmlspecialchars($comment['profile_photo']); ?>" 
+                   alt="<?php echo htmlspecialchars($comment['username']); ?>">
+            <?php else: ?>
+              <div class="h-12 w-12 rounded-full bg-[#A7D820] flex items-center justify-center text-white font-bold text-lg profile-initial">
+                <?php echo strtoupper(substr(htmlspecialchars($comment['username']), 0, 1)); ?>
+              </div>
+            <?php endif; ?>
+          </div>
+          <div class="flex-grow">
+            <div class="flex justify-between items-center mb-1">
+              <h3 class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($comment['username']); ?></h3>
+              <p class="text-xs text-gray-500"><?php echo date('M j, Y \a\t g:i a', strtotime($comment['created_at'])); ?></p>
+            </div>
+            <p class="text-gray-700"><?php echo nl2br(htmlspecialchars($comment['comment'])); ?></p>
+          </div>
+        </div>
+      </div>
+    <?php endforeach; ?>
+  <?php else: ?>
+    <p class="text-sm text-gray-500">No comments yet.</p>
+  <?php endif; ?>
+</div>
+
+
   </div>
 
   <!-- Add this script before closing body tag -->
@@ -498,6 +610,110 @@
           });
         });
       }
+    });
+
+    // Comment functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const commentForm = document.getElementById('commentForm');
+      
+      if (commentForm) {
+        commentForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          const comment = document.getElementById('comment').value;
+          const projectId = <?php echo $projectId; ?>;
+          
+          if (!comment.trim()) {
+            alert('Please enter a comment');
+            return;
+          }
+          
+          // Send AJAX request to add comment
+          const formData = new FormData();
+          formData.append('project_id', projectId);
+          formData.append('comment', comment);
+          
+          fetch('/gyaanuday/src/projects/add_comment.php', {
+            method: 'POST',
+            body: formData
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+            if (data.success) {
+              // Clear form
+              document.getElementById('comment').value = '';
+              
+              // Create new comment HTML with profile photo or initial
+              const newComment = document.createElement('div');
+              newComment.className = 'bg-white rounded-lg p-6 border border-[#e5e7eb] card';
+              
+              const date = new Date(data.created_at);
+              const formattedDate = date.toLocaleString('en-US', { 
+                month: 'short', 
+                day: 'numeric', 
+                year: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric', 
+                hour12: true 
+              });
+              
+              // Profile image handling with border
+              let profileHtml;
+              if (data.profile_photo) {
+                profileHtml = `<img class="h-12 w-12 rounded-full object-cover profile-img" src="/gyaanuday/uploads/profiles/${data.profile_photo}" alt="${data.username}">`;
+              } else {
+                const initial = data.username.charAt(0).toUpperCase();
+                profileHtml = `<div class="h-12 w-12 rounded-full bg-[#A7D820] flex items-center justify-center text-white font-bold text-lg profile-initial">${initial}</div>`;
+              }
+              
+              newComment.innerHTML = `
+                <div class="flex items-start space-x-4">
+                  <div class="flex-shrink-0">
+                    ${profileHtml}
+                  </div>
+                  <div class="flex-grow">
+                    <div class="flex justify-between items-center mb-1">
+                      <h3 class="text-sm font-medium text-gray-900">${data.username}</h3>
+                      <p class="text-xs text-gray-500">${formattedDate}</p>
+                    </div>
+                    <p class="text-gray-700">${data.comment.replace(/\n/g, '<br>')}</p>
+                  </div>
+                </div>
+              `;
+              
+              // Add new comment to the top of the list
+              const commentsContainer = document.getElementById('commentsContainer');
+              
+              // Remove "no comments" message if it exists
+              const noComments = document.getElementById('noComments');
+              if (noComments) {
+                noComments.remove();
+              }
+              
+              commentsContainer.insertBefore(newComment, commentsContainer.firstChild);
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to post comment. Please try again.');
+          });
+        });
+      }
+    });
+  </script>
+  
+  <script>
+    // Debug output to console
+    console.log("Page loaded successfully");
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log("DOM fully loaded");
+      console.log("Project ID: <?php echo $projectId; ?>");
+      console.log("Title: <?php echo addslashes($title); ?>");
     });
   </script>
 </body>
