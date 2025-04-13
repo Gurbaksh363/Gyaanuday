@@ -15,27 +15,18 @@ $user_id = $_SESSION['user_id'];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get form data
     $bio = isset($_POST['bio']) ? trim($_POST['bio']) : '';
-    $username = isset($_POST['username']) ? trim($_POST['username']) : '';
+    $original_username = isset($_POST['original_username']) ? trim($_POST['original_username']) : '';
     
     // Validate username
-    if (empty($username)) {
+    if (empty($original_username)) {
         $_SESSION['error'] = "Username cannot be empty.";
         header("Location: ../../public/profile.php");
         exit;
     }
     
-    // Check if username already exists (excluding current user)
-    $stmt = $pdo->prepare("SELECT id FROM users WHERE username = ? AND id != ?");
-    $stmt->execute([$username, $user_id]);
-    if ($stmt->rowCount() > 0) {
-        $_SESSION['error'] = "Username is already taken. Please choose another one.";
-        header("Location: ../../public/profile.php");
-        exit;
-    }
-    
-    // Start with basic user data update
-    $sql = "UPDATE users SET username = ?, bio = ? WHERE id = ?";
-    $params = [$username, $bio, $user_id];
+    // Only update the bio, don't change the username
+    $sql = "UPDATE users SET bio = ? WHERE id = ?";
+    $params = [$bio, $user_id];
     
     // Handle profile photo upload if provided
     if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] == 0) {
@@ -66,8 +57,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Move the uploaded file
         if (move_uploaded_file($_FILES['profile_photo']['tmp_name'], $target_file)) {
-            $sql = "UPDATE users SET username = ?, bio = ?, profile_photo = ? WHERE id = ?";
-            $params = [$username, $bio, $filename, $user_id];
+            $sql = "UPDATE users SET bio = ?, profile_photo = ? WHERE id = ?";
+            $params = [$bio, $filename, $user_id];
         } else {
             $_SESSION['error'] = "Failed to upload file.";
             header("Location: ../../public/profile.php");

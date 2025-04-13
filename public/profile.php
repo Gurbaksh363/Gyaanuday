@@ -3,25 +3,34 @@
 session_start();
 require_once __DIR__ . "/../config/database.php";
 
-// Initialize photo_url with a default value
-$photo_url = "https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/avatar.png";
+// Initialize photo_url with a better default value
+$photo_url = "/gyaanuday/public/images/default_profile.jpeg";  // Changed default avatar pathth
 
 // Get user data if logged in
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+    
+    // Improved query to get user data
+    $stmt = $pdo->prepare("SELECT id, username, email, bio, profile_photo FROM users WHERE id = ?");
     $stmt->execute([$user_id]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if ($user) {
-        $profile_photo = $user['profile_photo'] ?? 'default-avatar.png';
+        // Store user data properly
+        $username = htmlspecialchars($user['username']);
+        $email = htmlspecialchars($user['email']);
+        // Check if bio is null or empty and provide a default value
+        $bio = !empty($user['bio']) ? htmlspecialchars($user['bio']) : 'No bio available';
+        $profile_photo = $user['profile_photo'] ?? null;
         
         // Use consistent path handling with the upload path in update_profile.php
-        $photo_path = __DIR__ . "/../uploads/profile_photos/" . $profile_photo;
-        
-        // Use relative path for browser display
-        if (file_exists($photo_path) && $profile_photo) {
-            $photo_url = "../uploads/profile_photos/" . $profile_photo;
+        if (!empty($profile_photo)) {
+            $photo_path = __DIR__ . "/../uploads/profile_photos/" . $profile_photo;
+            
+            // Use relative path for browser display
+            if (file_exists($photo_path)) {
+                $photo_url = "../uploads/profile_photos/" . $profile_photo;
+            }
         }
     }
 } else {
@@ -126,7 +135,8 @@ $debug = false;
             <p>Photo path (server): <?= htmlspecialchars($photo_path ?? '') ?></p>
             <p>Photo URL (browser): <?= htmlspecialchars($photo_url) ?></p>
             <p>Photo exists: <?= isset($photo_path) && file_exists($photo_path) ? 'Yes' : 'No' ?></p>
-            <p>Document root: <?= htmlspecialchars($_SERVER['DOCUMENT_ROOT']) ?></p>
+            <p>Username: <?= $username ?></p>
+            <p>Bio: <?= $bio ?></p>
         </div>
     <?php endif; ?>
 
@@ -136,12 +146,12 @@ $debug = false;
             <!-- User info container with avatar and bio -->
             <div class="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8">
                 <div class="flex-shrink-0">
-                    <img src="<?= htmlspecialchars($photo_url) ?>" alt="User avatar" class="w-32 h-32 rounded-lg object-cover shadow-md">
+                    <img src="<?= $photo_url ?>" alt="User avatar" class="w-32 h-32 rounded-lg object-cover shadow-md">
                 </div>
                 
                 <div class="flex flex-col gap-4 flex-grow text-center md:text-left">
-                    <h1 class="text-[32px] leading-[48px] font-archivo text-[#171a1f]"><?= htmlspecialchars($user['username'] ?? 'User Name') ?></h1>
-                    <p class="text-base leading-[26px] text-[#565d6d] font-inter"><?= htmlspecialchars($user['bio'] ?? 'No bio available') ?></p>
+                    <h1 class="text-[32px] leading-[48px] font-archivo text-[#171a1f]"><?= $username ?></h1>
+                    <p class="text-base leading-[26px] text-[#565d6d] font-inter"><?= $bio ?></p>
                 </div>
             </div>
             
@@ -164,18 +174,17 @@ $debug = false;
                     <h2 class="text-2xl mb-6 font-archivo text-[#171a1f]">Update Your Profile</h2>
                     
                     <form action="../src/auth/update_profile.php" method="POST" enctype="multipart/form-data" class="space-y-6">
-                        <!-- Username field -->
+                        <!-- Username readonly field - showing the username but not allowing edits -->
                         <div>
-                            <label for="username" class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                            <label for="username-display" class="block text-sm font-medium text-gray-700 mb-2">Username</label>
                             <input 
                                 type="text" 
-                                name="username" 
-                                id="username" 
-                                value="<?= htmlspecialchars($user['username'] ?? '') ?>"
-                                class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-[#a7d820] focus:border-[#a7d820] focus:outline-none transition" 
-                                placeholder="Your username"
+                                id="username-display" 
+                                value="<?= $username ?>" 
+                                class="w-full p-3 border border-gray-200 rounded-md shadow-sm bg-gray-50 text-gray-600" 
+                                readonly
                             >
-                            <p class="mt-1 text-xs text-gray-500">This name will be visible to other users.</p>
+                            <p class="mt-1 text-xs text-gray-500">Username cannot be changed.</p>
                         </div>
                         
                         <!-- Profile Picture Section -->
@@ -183,7 +192,7 @@ $debug = false;
                             <div class="flex flex-col items-center md:items-start">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Current Photo</label>
                                 <div class="w-24 h-24">
-                                    <img src="<?= htmlspecialchars($photo_url) ?>" class="w-full h-full rounded-lg object-cover border border-gray-200">
+                                    <img src="<?= $photo_url ?>" class="w-full h-full rounded-lg object-cover border border-gray-200">
                                 </div>
                             </div>
                             
@@ -209,9 +218,12 @@ $debug = false;
                                 rows="4" 
                                 class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-[#a7d820] focus:border-[#a7d820] focus:outline-none transition" 
                                 placeholder="Tell us about yourself..."
-                            ><?= htmlspecialchars($user['bio'] ?? '') ?></textarea>
+                            ><?= $bio === 'No bio available' ? '' : $bio ?></textarea>
                             <p class="mt-1 text-xs text-gray-500">Brief description that will appear on your profile.</p>
                         </div>
+                        
+                        <!-- Hidden username field to keep username unchanged -->
+                        <input type="hidden" name="original_username" value="<?= $username ?>">
                         
                         <!-- Buttons -->
                         <div class="flex items-center justify-end space-x-3 pt-4">
