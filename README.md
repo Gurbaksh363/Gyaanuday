@@ -1,4 +1,4 @@
-```markdown
+
 # Gyaanuday Project
 
 Gyaanuday is a platform that allows users to submit their projects, search for others' projects, and engage with them through likes. The platform also supports user authentication, project management, and profile customization.
@@ -13,7 +13,7 @@ Gyaanuday is a platform that allows users to submit their projects, search for o
 
 ## File Structure
 
-```
+
 /gyanuday  
 │── /public  
 │   ├── index.php          # Homepage (Project listings, search bar)  
@@ -38,7 +38,6 @@ Gyaanuday is a platform that allows users to submit their projects, search for o
 │── .env                   # Environment variables (optional)  
 │── .htaccess              # Rewrite rules (optional)  
 │── README.md              # Project Documentation  
-```
 
 ## Setup
 
