@@ -3,57 +3,58 @@ session_start();
 require_once __DIR__ . "/../../config/database.php";
 
 // Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    $_SESSION['error'] = "You need to be logged in to perform this action.";
-    header("Location: /gyaanuday/public/login.php");
-    exit;
-}
-
-// Check if project ID is provided
-if (!isset($_GET['id']) || empty($_GET['id'])) {
-    $_SESSION['error'] = "Invalid project ID.";
-    header("Location: /gyaanuday/public/profile.php");
+if (!isset($_SESSION['user_id']) || !isset($_GET['id']) || empty($_GET['id'])) {
+    $_SESSION['error'] = !isset($_SESSION['user_id']) ? "Login required" : "Invalid project ID";
+    header("Location: /gyaanuday/public/" . (!isset($_SESSION['user_id']) ? "login.php" : "profile.php"));
     exit;
 }
 
 $project_id = $_GET['id'];
 $user_id = $_SESSION['user_id'];
 
-// First verify that the project belongs to the current user
-$stmt = $pdo->prepare("SELECT * FROM projects WHERE id = ? AND user_id = ?");
+// Verify project ownership
+$stmt = $pdo->prepare("SELECT id, thumbnail, project_file FROM projects WHERE id = ? AND user_id = ?");
 $stmt->execute([$project_id, $user_id]);
 $project = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$project) {
-    $_SESSION['error'] = "You don't have permission to delete this project or the project doesn't exist.";
+    $_SESSION['error'] = "Permission denied or project not found";
     header("Location: /gyaanuday/public/profile.php");
     exit;
 }
 
 try {
-    // Begin a transaction as we might need to delete related data in the future
     $pdo->beginTransaction();
     
-    // Delete any project images if they exist
-    if (!empty($project['image_url']) && strpos($project['image_url'], '../uploads/') === 0) {
-        $image_path = __DIR__ . '/../../' . substr($project['image_url'], 3);
-        if (file_exists($image_path)) {
-            unlink($image_path);
-        }
+    // Delete project files if they exist
+    if (!empty($project['thumbnail'])) {
+        $thumbnail_path = __DIR__ . "/../../uploads/" . $project['thumbnail'];
+        if (file_exists($thumbnail_path)) unlink($thumbnail_path);
     }
     
-    // Delete the project from the database
+    if (!empty($project['project_file'])) {
+        $file_path = __DIR__ . "/../../uploads/" . $project['project_file'];
+        if (file_exists($file_path)) unlink($file_path);
+    }
+    
+    // Delete related records and then the project
+    $stmt = $pdo->prepare("DELETE FROM comments WHERE project_id = ?");
+    $stmt->execute([$project_id]);
+    
+    $stmt = $pdo->prepare("DELETE FROM likes WHERE project_id = ?");
+    $stmt->execute([$project_id]);
+    
+    $stmt = $pdo->prepare("DELETE FROM bookmarks WHERE project_id = ?");
+    $stmt->execute([$project_id]);
+    
     $stmt = $pdo->prepare("DELETE FROM projects WHERE id = ?");
     $stmt->execute([$project_id]);
     
-    // Commit the transaction
     $pdo->commit();
-    
-    $_SESSION['success'] = "Project successfully deleted.";
+    $_SESSION['success'] = "Project deleted successfully";
 } catch (PDOException $e) {
-    // Roll back the transaction if something failed
     $pdo->rollBack();
-    $_SESSION['error'] = "Error deleting project: " . $e->getMessage();
+    $_SESSION['error'] = "Error occurred"; // Simplified error message
 }
 
 header("Location: /gyaanuday/public/profile.php");

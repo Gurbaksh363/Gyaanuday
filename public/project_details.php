@@ -674,7 +674,7 @@ require_once __DIR__ . "/../config/database.php";
               // Profile image handling with border
               let profileHtml;
               if (data.profile_photo) {
-                profileHtml = `<img class="h-12 w-12 rounded-full object-cover profile-img" src="/gyaanuday/uploads/profiles/${data.profile_photo}" alt="${data.username}">`;
+                profileHtml = `<img class="h-12 w-12 rounded-full object-cover profile-img" src="/gyaanuday/uploads/profile_photos/${data.profile_photo}" alt="${data.username}">`;
               } else {
                 const initial = data.username.charAt(0).toUpperCase();
                 profileHtml = `<div class="h-12 w-12 rounded-full bg-[#A7D820] flex items-center justify-center text-white font-bold text-lg profile-initial">${initial}</div>`;

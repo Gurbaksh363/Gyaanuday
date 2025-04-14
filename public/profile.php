@@ -370,6 +370,90 @@ $debug = false;
             </form>
         </div>
     </div>
+    
+    <!-- Project Deletion Modal -->
+    <div id="deleteProjectModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <h2 class="text-2xl font-bold text-red-600 mb-4">Delete Project</h2>
+            <p class="mb-6 text-gray-700">Are you sure you want to delete this project? This action cannot be undone.</p>
+            
+            <div class="flex space-x-3 pt-4">
+                <button 
+                    type="button" 
+                    id="cancelProjectDelete" 
+                    class="flex-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                >
+                    Cancel
+                </button>
+                <button 
+                    type="button" 
+                    id="confirmProjectDelete" 
+                    class="flex-1 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                >
+                    Delete Project
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bookmark Removal Modal -->
+    <div id="removeBookmarkModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <h2 class="text-2xl font-bold text-blue-600 mb-4">Remove Bookmark</h2>
+            <p class="mb-6 text-gray-700">Are you sure you want to remove this bookmark?</p>
+            
+            <div class="flex space-x-3 pt-4">
+                <button 
+                    type="button" 
+                    id="cancelBookmarkRemoval" 
+                    class="flex-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                >
+                    Cancel
+                </button>
+                <button 
+                    type="button" 
+                    id="confirmBookmarkRemoval" 
+                    class="flex-1 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#f97316] hover:bg-[#ea580c] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#f97316]"
+                >
+                    Remove Bookmark
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Notification -->
+    <div id="successNotification" class="fixed top-4 right-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 hidden shadow-md rounded-md transition-all duration-300 transform translate-x-full opacity-0">
+        <div class="flex items-center">
+            <div class="py-1"><i class="fas fa-check-circle text-green-500"></i></div>
+            <div class="ml-3">
+                <p id="successMessage" class="text-sm"></p>
+            </div>
+            <div class="ml-auto pl-3">
+                <div class="-mx-1.5 -my-1.5">
+                    <button type="button" class="close-notification inline-flex rounded-md p-1.5 text-green-500 hover:bg-green-200 focus:outline-none">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Notification -->
+    <div id="errorNotification" class="fixed top-4 right-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 hidden shadow-md rounded-md transition-all duration-300 transform translate-x-full opacity-0">
+        <div class="flex items-center">
+            <div class="py-1"><i class="fas fa-exclamation-circle text-red-500"></i></div>
+            <div class="ml-3">
+                <p id="errorMessage" class="text-sm"></p>
+            </div>
+            <div class="ml-auto pl-3">
+                <div class="-mx-1.5 -my-1.5">
+                    <button type="button" class="close-notification inline-flex rounded-md p-1.5 text-red-500 hover:bg-red-200 focus:outline-none">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <?php include 'components/footer.php'; ?>
 
@@ -396,67 +480,11 @@ $debug = false;
             document.getElementById('file_name_display').textContent = fileName;
         });
         
-        // Project deletion functionality
-        document.querySelectorAll('.delete-project').forEach(button => {
-            button.addEventListener('click', function() {
-                const projectId = this.getAttribute('data-project-id');
-                if (confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
-                    window.location.href = '../src/projects/delete_project.php?id=' + projectId;
-                }
-            });
-        });
-        
         // Project card click to view details
         document.querySelectorAll('.project-card').forEach(card => {
             card.addEventListener('click', function() {
                 const projectId = this.getAttribute('data-project-id');
                 window.location.href = 'project_details.php?id=' + projectId;
-            });
-        });
-
-        // Remove bookmark functionality
-        document.querySelectorAll('.bookmark-remove').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.stopPropagation(); // Prevent triggering the parent card click
-                const bookmarkId = this.getAttribute('data-bookmark-id');
-                const bookmarkCard = this.closest('.bg-white');
-                
-                if (confirm('Are you sure you want to remove this bookmark?')) {
-                    // Send AJAX request to remove bookmark
-                    const formData = new FormData();
-                    formData.append('bookmark_id', bookmarkId);
-                    
-                    fetch('/gyaanuday/src/projects/remove_bookmark.php', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Remove the project card from the DOM
-                            bookmarkCard.remove();
-                            
-                            // If no more bookmarks, show the empty message
-                            const bookmarksGrid = document.getElementById('bookmarksGrid');
-                            if (!bookmarksGrid || bookmarksGrid.children.length === 0) {
-                                const bookmarkedSection = document.getElementById('bookmarkedProjectsSection');
-                                bookmarkedSection.innerHTML = `
-                                    <h1 class="text-center text-[32px] text-[#171a1f] font-archivo mb-12 leading-[48px]">Bookmarked Projects</h1>
-                                    <div class="text-center py-8 text-gray-500" id="noBookmarksMessage">
-                                        <p>You haven't bookmarked any projects yet.</p>
-                                        <a href="projects.php" class="text-[#A7D820] hover:underline mt-2 inline-block">Browse Projects</a>
-                                    </div>
-                                `;
-                            }
-                        } else {
-                            alert('Failed to remove bookmark: ' + data.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('An error occurred. Please try again.');
-                    });
-                }
             });
         });
 
@@ -478,6 +506,15 @@ $debug = false;
             if (event.target === deleteAccountModal) {
                 deleteAccountModal.classList.add('hidden');
             }
+            if (event.target === deleteProjectModal) {
+                deleteProjectModal.classList.add('hidden');
+                currentProjectId = null;
+            }
+            if (event.target === removeBookmarkModal) {
+                removeBookmarkModal.classList.add('hidden');
+                currentBookmarkId = null;
+                currentBookmarkCard = null;
+            }
         });
         
         // Search functionality
@@ -487,22 +524,143 @@ $debug = false;
         
         // Open search overlay
         searchButton.addEventListener('click', () => {
-          searchOverlay.classList.add('active');
-          setTimeout(() => {
-            document.querySelector('.search-container input').focus();
-          }, 400);
+            searchOverlay.classList.add('active');
+            setTimeout(() => {
+                document.querySelector('.search-container input').focus();
+            }, 400);
         });
         
         // Close search overlay
         closeSearch.addEventListener('click', () => {
-          searchOverlay.classList.remove('active');
+            searchOverlay.classList.remove('active');
         });
         
         // Close search with ESC key
         document.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape' && searchOverlay.classList.contains('active')) {
-            searchOverlay.classList.remove('active');
-          }
+            if (e.key === 'Escape' && searchOverlay.classList.contains('active')) {
+                searchOverlay.classList.remove('active');
+            }
+        });
+
+        // Project deletion functionality (with modal)
+        let currentProjectId = null;
+        const deleteProjectModal = document.getElementById('deleteProjectModal');
+        const cancelProjectDelete = document.getElementById('cancelProjectDelete');
+        const confirmProjectDelete = document.getElementById('confirmProjectDelete');
+
+        document.querySelectorAll('.delete-project').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent card click
+                currentProjectId = this.getAttribute('data-project-id');
+                deleteProjectModal.classList.remove('hidden');
+            });
+        });
+        
+        cancelProjectDelete.addEventListener('click', function() {
+            deleteProjectModal.classList.add('hidden');
+            currentProjectId = null;
+        });
+        
+        confirmProjectDelete.addEventListener('click', function() {
+            if (currentProjectId) {
+                window.location.href = '../src/projects/delete_project.php?id=' + currentProjectId;
+            }
+        });
+
+        // Remove bookmark functionality (with modal)
+        let currentBookmarkId = null;
+        let currentBookmarkCard = null;
+        const removeBookmarkModal = document.getElementById('removeBookmarkModal');
+        const cancelBookmarkRemoval = document.getElementById('cancelBookmarkRemoval');
+        const confirmBookmarkRemoval = document.getElementById('confirmBookmarkRemoval');
+
+        document.querySelectorAll('.bookmark-remove').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent card click
+                currentBookmarkId = this.getAttribute('data-bookmark-id');
+                currentBookmarkCard = this.closest('.bg-white');
+                removeBookmarkModal.classList.remove('hidden');
+            });
+        });
+        
+        cancelBookmarkRemoval.addEventListener('click', function() {
+            removeBookmarkModal.classList.add('hidden');
+            currentBookmarkId = null;
+            currentBookmarkCard = null;
+        });
+        
+        confirmBookmarkRemoval.addEventListener('click', function() {
+            if (currentBookmarkId && currentBookmarkCard) {
+                // Send AJAX request to remove bookmark
+                const formData = new FormData();
+                formData.append('bookmark_id', currentBookmarkId);
+                
+                fetch('/gyaanuday/src/projects/remove_bookmark.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    removeBookmarkModal.classList.add('hidden');
+                    
+                    if (data.success) {
+                        // Remove the project card from the DOM
+                        currentBookmarkCard.remove();
+                        
+                        // Show success notification
+                        showNotification('success', 'Bookmark removed successfully');
+                        
+                        // If no more bookmarks, show the empty message
+                        const bookmarksGrid = document.getElementById('bookmarksGrid');
+                        if (!bookmarksGrid || bookmarksGrid.children.length === 0) {
+                            const bookmarkedSection = document.getElementById('bookmarkedProjectsSection');
+                            bookmarkedSection.innerHTML = `
+                                <h1 class="text-center text-[32px] text-[#171a1f] font-archivo mb-12 leading-[48px]">Bookmarked Projects</h1>
+                                <div class="text-center py-8 text-gray-500" id="noBookmarksMessage">
+                                    <p>You haven't bookmarked any projects yet.</p>
+                                    <a href="projects.php" class="text-[#A7D820] hover:underline mt-2 inline-block">Browse Projects</a>
+                                </div>
+                            `;
+                        }
+                    } else {
+                        showNotification('error', 'Failed to remove bookmark');
+                    }
+                })
+                .catch(error => {
+                    removeBookmarkModal.classList.add('hidden');
+                    showNotification('error', 'An error occurred');
+                });
+            }
+        });
+
+        // Notification functions
+        function showNotification(type, message) {
+            const notification = document.getElementById(type + 'Notification');
+            const messageElement = document.getElementById(type + 'Message');
+            
+            messageElement.textContent = message;
+            notification.classList.remove('hidden', 'translate-x-full', 'opacity-0');
+            notification.classList.add('translate-x-0', 'opacity-100');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                hideNotification(notification);
+            }, 5000);
+        }
+        
+        function hideNotification(notification) {
+            notification.classList.add('translate-x-full', 'opacity-0');
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 300);
+        }
+        
+        // Close notification on click
+        document.querySelectorAll('.close-notification').forEach(button => {
+            button.addEventListener('click', function() {
+                const notification = this.closest('[id$="Notification"]');
+                hideNotification(notification);
+            });
         });
     </script>
 </body>
