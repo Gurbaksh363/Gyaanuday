@@ -208,6 +208,27 @@ require_once __DIR__ . "/../config/database.php";
   <!-- Include navigation -->
   <?php include 'navigation.php'; ?>
 
+  <!-- Login Modal -->
+  <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Sign in required</h2>
+        <button id="closeLoginModal" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <p class="mb-6 text-gray-600">Please sign in to continue with this action.</p>
+      <div class="flex space-x-3">
+        <a href="login.php" class="flex-1 px-4 py-2 bg-[#A7D820] text-white rounded-md text-center hover:bg-opacity-90 transition-all">
+          Log In
+        </a>
+        <a href="register.php" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md text-center hover:bg-gray-50 transition-all">
+          Sign Up
+        </a>
+      </div>
+    </div>
+  </div>
+
   <div class="page-content">
     <?php
     // Get project ID from URL parameter
@@ -505,14 +526,14 @@ require_once __DIR__ . "/../config/database.php";
 
   <?php include 'components/footer.php'; ?>
 
-  <!-- Add this script before closing body tag -->
   <script>
-    // Search functionality
-    const searchButton = document.getElementById('searchButton');
-    const searchOverlay = document.getElementById('searchOverlay');
-    const closeSearch = document.getElementById('closeSearch');
-    
-    // Open search overlay
+  // Search functionality
+  const searchButton = document.getElementById('searchButton');
+  const searchOverlay = document.getElementById('searchOverlay');
+  const closeSearch = document.getElementById('closeSearch');
+  
+  // Open search overlay
+  if (searchButton && searchOverlay && closeSearch) {
     searchButton.addEventListener('click', () => {
       searchOverlay.classList.add('active');
       setTimeout(() => {
@@ -531,33 +552,63 @@ require_once __DIR__ . "/../config/database.php";
         searchOverlay.classList.remove('active');
       }
     });
+  }
 
-    // Like functionality
-    document.addEventListener('DOMContentLoaded', function() {
-      const likeButton = document.getElementById('likeButton');
-      const bookmarkButton = document.getElementById('bookmarkButton');
-      
-      if (likeButton) {
-        likeButton.addEventListener('click', function() {
-          const projectId = this.getAttribute('data-project-id');
-          
-          // Check if user is logged in
-          <?php if (!isset($_SESSION['user_id'])): ?>
-            alert('Please login to like this project');
+  // Login Modal Functionality 
+  const loginModal = document.getElementById('loginModal');
+  const closeLoginModal = document.getElementById('closeLoginModal');
+  
+  function showLoginModal() {
+    loginModal.classList.remove('hidden');
+  }
+  
+  if (closeLoginModal) {
+    closeLoginModal.addEventListener('click', () => {
+      loginModal.classList.add('hidden');
+    });
+  }
+  
+  // Close modal when clicking outside
+  window.addEventListener('click', (event) => {
+    if (loginModal && event.target === loginModal) {
+      loginModal.classList.add('hidden');
+    }
+  });
+  
+  // Close modal with ESC key
+  document.addEventListener('keydown', (e) => {
+    if (loginModal && e.key === 'Escape' && !loginModal.classList.contains('hidden')) {
+      loginModal.classList.add('hidden');
+    }
+  });
+  
+  // Like and bookmark functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const likeButton = document.getElementById('likeButton');
+    const bookmarkButton = document.getElementById('bookmarkButton');
+    
+    if (likeButton) {
+      likeButton.addEventListener('click', function() {
+        const projectId = this.getAttribute('data-project-id');
+        
+        // Send AJAX request to like/unlike
+        const formData = new FormData();
+        formData.append('project_id', projectId);
+        
+        fetch('/gyaanuday/src/projects/like_project.php', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'unauthenticated') {
+            // Show login modal instead of alert
+            showLoginModal();
             return;
-          <?php endif; ?>
+          }
           
-          // Send AJAX request to like/unlike
-          const formData = new FormData();
-          formData.append('project_id', projectId);
-          
-          fetch('/gyaanuday/src/projects/like_project.php', {
-            method: 'POST',
-            body: formData
-          })
-          .then(response => response.json())
-          .then(data => {
-            // Update like button appearance and count
+          // Update like button appearance and count
+          if (data.status === 'liked' || data.status === 'unliked') {
             const likeButton = document.getElementById('likeButton');
             const likeCount = document.querySelector('.like-count');
             
@@ -572,35 +623,37 @@ require_once __DIR__ . "/../config/database.php";
             // Update count with proper singular/plural form
             const count = data.count;
             likeCount.textContent = `${count} ${count == 1 ? 'like' : 'likes'}`;
-          })
-          .catch(error => {
-            console.error('Error:', error);
-          });
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
         });
-      }
-      
-      // Bookmark functionality
-      if (bookmarkButton) {
-        bookmarkButton.addEventListener('click', function() {
-          const projectId = this.getAttribute('data-project-id');
-          
-          // Check if user is logged in
-          <?php if (!isset($_SESSION['user_id'])): ?>
-            alert('Please login to bookmark this project');
+      });
+    }
+    
+    // Bookmark functionality
+    if (bookmarkButton) {
+      bookmarkButton.addEventListener('click', function() {
+        const projectId = this.getAttribute('data-project-id');
+        
+        // Send AJAX request to bookmark/unbookmark
+        const formData = new FormData();
+        formData.append('project_id', projectId);
+        
+        fetch('/gyaanuday/src/projects/bookmark_project.php', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'unauthenticated') {
+            // Show login modal instead of alert
+            showLoginModal();
             return;
-          <?php endif; ?>
+          }
           
-          // Send AJAX request to bookmark/unbookmark
-          const formData = new FormData();
-          formData.append('project_id', projectId);
-          
-          fetch('/gyaanuday/src/projects/bookmark_project.php', {
-            method: 'POST',
-            body: formData
-          })
-          .then(response => response.json())
-          .then(data => {
-            // Update bookmark button appearance
+          // Update bookmark button appearance
+          if (data.status === 'bookmarked' || data.status === 'unbookmarked') {
             const bookmarkButton = document.getElementById('bookmarkButton');
             const bookmarkCount = document.querySelector('.bookmark-count');
             
@@ -613,117 +666,112 @@ require_once __DIR__ . "/../config/database.php";
               bookmarkButton.querySelector('i').classList.replace('fas', 'far');
               bookmarkCount.textContent = 'Save';
             }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-          });
-        });
-      }
-    });
-
-    // Comment functionality
-    document.addEventListener('DOMContentLoaded', function() {
-      const commentForm = document.getElementById('commentForm');
-      
-      if (commentForm) {
-        commentForm.addEventListener('submit', function(e) {
-          e.preventDefault();
-          
-          const comment = document.getElementById('comment').value;
-          const projectId = <?php echo $projectId; ?>;
-          
-          if (!comment.trim()) {
-            alert('Please enter a comment');
-            return;
           }
-          
-          // Send AJAX request to add comment
-          const formData = new FormData();
-          formData.append('project_id', projectId);
-          formData.append('comment', comment);
-          
-          fetch('/gyaanuday/src/projects/add_comment.php', {
-            method: 'POST',
-            body: formData
-          })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-            return response.json();
-          })
-          .then(data => {
-            if (data.success) {
-              // Clear form
-              document.getElementById('comment').value = '';
-              
-              // Create new comment HTML with profile photo or initial
-              const newComment = document.createElement('div');
-              newComment.className = 'bg-white rounded-lg p-6 border border-[#e5e7eb] card';
-              
-              const date = new Date(data.created_at);
-              const formattedDate = date.toLocaleString('en-US', { 
-                month: 'short', 
-                day: 'numeric', 
-                year: 'numeric',
-                hour: 'numeric',
-                minute: 'numeric', 
-                hour12: true 
-              });
-              
-              // Profile image handling with border
-              let profileHtml;
-              if (data.profile_photo) {
-                profileHtml = `<img class="h-12 w-12 rounded-full object-cover profile-img" src="/gyaanuday/uploads/profile_photos/${data.profile_photo}" alt="${data.username}">`;
-              } else {
-                const initial = data.username.charAt(0).toUpperCase();
-                profileHtml = `<div class="h-12 w-12 rounded-full bg-[#A7D820] flex items-center justify-center text-white font-bold text-lg profile-initial">${initial}</div>`;
-              }
-              
-              newComment.innerHTML = `
-                <div class="flex items-start space-x-4">
-                  <div class="flex-shrink-0">
-                    ${profileHtml}
-                  </div>
-                  <div class="flex-grow">
-                    <div class="flex justify-between items-center mb-1">
-                      <h3 class="text-sm font-medium text-gray-900">${data.username}</h3>
-                      <p class="text-xs text-gray-500">${formattedDate}</p>
-                    </div>
-                    <p class="text-gray-700">${data.comment.replace(/\n/g, '<br>')}</p>
-                  </div>
-                </div>
-              `;
-              
-              // Add new comment to the top of the list
-              const commentsContainer = document.getElementById('commentsContainer');
-              
-              // Remove "no comments" message if it exists
-              const noComments = document.getElementById('noComments');
-              if (noComments) {
-                noComments.remove();
-              }
-              
-              commentsContainer.insertBefore(newComment, commentsContainer.firstChild);
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            alert('Failed to post comment. Please try again.');
-          });
+        })
+        .catch(error => {
+          console.error('Error:', error);
         });
-      }
-    });
-  </script>
-  
-  <script>
+      });
+    }
+    
+    // Comment form functionality
+    const commentForm = document.getElementById('commentForm');
+    
+    if (commentForm) {
+      commentForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const comment = document.getElementById('comment').value;
+        const projectId = <?php echo $projectId; ?>;
+        
+        if (!comment.trim()) {
+          alert('Please enter a comment');
+          return;
+        }
+        
+        // Send AJAX request to add comment
+        const formData = new FormData();
+        formData.append('project_id', projectId);
+        formData.append('comment', comment);
+        
+        fetch('/gyaanuday/src/projects/add_comment.php', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.success) {
+            // Clear form
+            document.getElementById('comment').value = '';
+            
+            // Create new comment HTML with profile photo or initial
+            const newComment = document.createElement('div');
+            newComment.className = 'bg-white rounded-lg p-6 border border-[#e5e7eb] card';
+            
+            const date = new Date(data.created_at);
+            const formattedDate = date.toLocaleString('en-US', { 
+              month: 'short', 
+              day: 'numeric', 
+              year: 'numeric',
+              hour: 'numeric',
+              minute: 'numeric', 
+              hour12: true 
+            });
+            
+            // Profile image handling with border
+            let profileHtml;
+            if (data.profile_photo) {
+              profileHtml = `<img class="h-12 w-12 rounded-full object-cover profile-img" src="/gyaanuday/uploads/profile_photos/${data.profile_photo}" alt="${data.username}">`;
+            } else {
+              const initial = data.username.charAt(0).toUpperCase();
+              profileHtml = `<div class="h-12 w-12 rounded-full bg-[#A7D820] flex items-center justify-center text-white font-bold text-lg profile-initial">${initial}</div>`;
+            }
+            
+            newComment.innerHTML = `
+              <div class="flex items-start space-x-4">
+                <div class="flex-shrink-0">
+                  ${profileHtml}
+                </div>
+                <div class="flex-grow">
+                  <div class="flex justify-between items-center mb-1">
+                    <h3 class="text-sm font-medium text-gray-900">${data.username}</h3>
+                    <p class="text-xs text-gray-500">${formattedDate}</p>
+                  </div>
+                  <p class="text-gray-700">${data.comment.replace(/\n/g, '<br>')}</p>
+                </div>
+              </div>
+            `;
+            
+            // Add new comment to the top of the list
+            const commentsContainer = document.getElementById('commentsContainer');
+            
+            // Remove "no comments" message if it exists
+            const noComments = document.getElementById('noComments');
+            if (noComments) {
+              noComments.remove();
+            }
+            
+            commentsContainer.insertBefore(newComment, commentsContainer.firstChild);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Failed to post comment. Please try again.');
+        });
+      });
+    }
+    
     // Debug output to console
     console.log("Page loaded successfully");
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log("DOM fully loaded");
-      console.log("Project ID: <?php echo $projectId; ?>");
-      console.log("Title: <?php echo addslashes($title); ?>");
-    });
-  </script>
+    console.log("DOM fully loaded");
+    console.log("Project ID: <?php echo $projectId; ?>");
+    console.log("Title: <?php echo addslashes($title); ?>");
+  });
+</script>
 </body>
 </html>

@@ -103,6 +103,27 @@ require_once __DIR__ . "/../config/database.php";
   <!-- Include navigation -->
   <?php include 'navigation.php'; ?>
 
+  <!-- Login Modal -->
+  <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Sign in required</h2>
+        <button id="closeLoginModal" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <p class="mb-6 text-gray-600">Please sign in to continue with this action.</p>
+      <div class="flex space-x-3">
+        <a href="login.php" class="flex-1 px-4 py-2 bg-[#A7D820] text-white rounded-md text-center hover:bg-opacity-90 transition-all">
+          Sign In
+        </a>
+        <a href="register.php" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md text-center hover:bg-gray-50 transition-all">
+          Register
+        </a>
+      </div>
+    </div>
+  </div>
+
   <!-- Page Header -->
   <div class="bg-white shadow-sm">
     <div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
@@ -307,6 +328,34 @@ require_once __DIR__ . "/../config/database.php";
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && searchOverlay.classList.contains('active')) {
         searchOverlay.classList.remove('active');
+      }
+    });
+    
+    // Login Modal Functionality
+    const loginModal = document.getElementById('loginModal');
+    const closeLoginModal = document.getElementById('closeLoginModal');
+    
+    // Function to show login modal
+    function showLoginModal() {
+      loginModal.classList.remove('hidden');
+    }
+    
+    // Close modal when clicking the close button
+    closeLoginModal.addEventListener('click', () => {
+      loginModal.classList.add('hidden');
+    });
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', (event) => {
+      if (event.target === loginModal) {
+        loginModal.classList.add('hidden');
+      }
+    });
+    
+    // Close modal with ESC key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !loginModal.classList.contains('hidden')) {
+        loginModal.classList.add('hidden');
       }
     });
   </script>

@@ -175,6 +175,39 @@
             margin-right: 8px;
             font-size: 16px;
         }
+
+        /* Error message styling */
+        .error-message {
+            color: #e74c3c;
+            background-color: #fde8e8;
+            border: 1px solid #f5b7b1;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        /* Show password toggle */
+        .password-toggle {
+            cursor: pointer;
+            color: #565d6d;
+            transition: color 0.3s ease;
+        }
+        
+        .password-toggle:hover {
+            color: #A7D820;
+        }
+        
+        /* Success message styling */
+        .success-message {
+            color: #27ae60;
+            background-color: #e8f8f0;
+            border: 1px solid #abebc6;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -196,6 +229,20 @@
             <p>Welcome back! Please login to your account</p>
         </header>
 
+        <!-- Error Messages -->
+        <?php if(isset($_SESSION['error'])): ?>
+            <div class="error-message">
+                <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+            </div>
+        <?php endif; ?>
+        
+        <!-- Success Messages -->
+        <?php if(isset($_SESSION['success'])): ?>
+            <div class="success-message">
+                <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+            </div>
+        <?php endif; ?>
+
         <!-- Form -->
         <form method="post" action="../src/auth/process_login.php">
             <div class="input-group">
@@ -205,7 +252,10 @@
 
             <div class="input-group">
                 <span class="icon"><i class="fas fa-lock"></i></span>
-                <input name="password" type="password" placeholder="Enter your password" required>
+                <input name="password" type="password" id="password" placeholder="Enter your password" required>
+                <span class="password-toggle" id="togglePassword">
+                    <i class="fas fa-eye"></i>
+                </span>
             </div>
 
             <button type="submit" class="btn-primary">Log In</button>
@@ -216,5 +266,24 @@
             <p>Don't have an account? <a href="register.php">Sign Up</a></p>
         </footer>
     </div>
+    
+    <!-- Simple JavaScript for password toggle -->
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            // Toggle password visibility
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    </script>
 </body>
 </html>

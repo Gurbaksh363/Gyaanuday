@@ -6,8 +6,8 @@ header('Content-Type: application/json');
 
 if (!isset($_SESSION['user_id'])) {
     echo json_encode([
-        'status' => 'error',
-        'message' => 'User not logged in'
+        'status' => 'unauthenticated',
+        'message' => 'Please sign in to bookmark projects'
     ]);
     exit;
 }
@@ -64,7 +64,7 @@ try {
 } catch (PDOException $e) {
     echo json_encode([
         'status' => 'error',
-        'message' => 'Database error: ' . $e->getMessage()
+        'message' => 'Database error'
     ]);
 }
 ?>
