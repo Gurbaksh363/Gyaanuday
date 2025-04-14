@@ -236,23 +236,9 @@ require_once __DIR__ . "/../config/database.php";
       ?>
     </div>
     
-    <!-- Pagination -->
+    <!-- Pagination - Simplified -->
     <div class="flex justify-center mt-12">
-      <nav class="inline-flex rounded-md shadow-sm -space-x-px">
-        <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-          <span class="sr-only">Previous</span>
-          <i class="fas fa-chevron-left"></i>
-        </a>
-        <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">1</a>
-        <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">2</a>
-        <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-[#A7D820] text-sm font-medium text-white">3</a>
-        <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">4</a>
-        <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">5</a>
-        <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-          <span class="sr-only">Next</span>
-          <i class="fas fa-chevron-right"></i>
-        </a>
-      </nav>
+      <p class="text-sm text-gray-500">Showing all available projects</p>
     </div>
   </div>
 
