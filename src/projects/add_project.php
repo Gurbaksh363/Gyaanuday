@@ -19,11 +19,14 @@
 
     // Handle project file upload
     $targetDir = __DIR__ . "/../../uploads/";
-    $fileName = basename($_FILES['project_file']['name']);
+    $originalFileName = basename($_FILES['project_file']['name']);
+    $fileType = strtolower(pathinfo($originalFileName, PATHINFO_EXTENSION));
+    
+    // Generate a unique name for the project file
+    $fileName = uniqid('project_', true) . '.' . $fileType;
     $targetFile = $targetDir . $fileName;
 
     // Validate project file type (allow images, pdfs, etc.)
-    $fileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
     $allowedTypes = ['jpg', 'png', 'jpeg', 'pdf', 'mp4', 'mp3'];
     if (!in_array($fileType, $allowedTypes)) {
       die("Only JPG, PNG, JPEG, PDF, MP4, MP3 files are allowed for the project file.");

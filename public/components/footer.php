@@ -26,10 +26,10 @@
         <div>
           <h3 class="text-lg font-semibold mb-3">Follow Us</h3>
           <div class="flex space-x-4">
-            <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook-f"></i></a>
-            <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-twitter"></i></a>
-            <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-instagram"></i></a>
-            <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-linkedin-in"></i></a>
+            <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
           </div>
         </div>
       </div>
