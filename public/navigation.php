@@ -6,7 +6,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 $isLoggedIn = isset($_SESSION['user_id']);
 
 // Set photo URL if user is logged in
-$photo_url = "https://dashboard.codeparrot.ai/api/image/Z90sbsNZNkcbc4lS/avatar.png";
+$photo_url = "/gyaanuday/public/images/default_profile.jpeg";
 if ($isLoggedIn && isset($pdo)) {
     $user_id = $_SESSION['user_id'];
     $stmt = $pdo->prepare("SELECT profile_photo FROM users WHERE id = ?");
