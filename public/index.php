@@ -126,6 +126,16 @@ require_once __DIR__ . "/../config/database.php";
           $thumb = "/gyaanuday/assets/default_icon.png"; // Use your own icon or placeholder for non-image files
         }
 
+        // Process tags - split by comma and create tag spans
+        $tagsArray = explode(',', $tags);
+        $tagsHtml = '';
+        foreach ($tagsArray as $tag) {
+          $tag = trim($tag);
+          if (!empty($tag)) {
+            $tagsHtml .= '<span class="inline-block bg-gray-100 text-[#565d6d] text-xs px-2 py-1 rounded-full mr-1 mb-1">' . $tag . '</span>';
+          }
+        }
+
         echo "
         <a href='project_details.php?id=$projectId' class='bg-white shadow-md rounded-lg p-4 border border-[#bdc1ca] card-hover'>
           <div class='relative h-48 overflow-hidden'>
@@ -133,7 +143,7 @@ require_once __DIR__ . "/../config/database.php";
           </div>
           <h3 class='text-lg font-semibold mt-2 text-[#171a1f] truncate'>" . $title . "</h3>
           <p class='text-[#565d6d] text-[16px] leading-[26px] line-clamp-2 h-13 overflow-hidden'>" . $description . "</p>
-          <p class='text-[#9095a1] text-[14px] mt-2 truncate'>Tags: $tags</p>
+          <div class='mt-2 flex flex-wrap'>" . $tagsHtml . "</div>
         </a>";
       }
       ?>
