@@ -4,7 +4,7 @@ session_start();
 require_once __DIR__ . "/../config/database.php";
 
 // Initialize photo_url with a better default value
-$photo_url = "/gyaanuday/public/images/default_profile.jpeg";  // Changed default avatar pathth
+$photo_url = "./images/default_profile.jpeg";  // Changed default avatar pathth
 
 // Get user data if logged in
 if (isset($_SESSION['user_id'])) {

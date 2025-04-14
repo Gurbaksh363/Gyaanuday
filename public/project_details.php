@@ -19,6 +19,12 @@ require_once __DIR__ . "/../config/database.php";
     body {
       font-family: 'Inter', sans-serif;
       background-color: #f9fafb;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .page-content {
+      flex: 1;
     }
     h1, h2, h3 {
       font-family: 'Archivo', sans-serif;
@@ -202,297 +208,299 @@ require_once __DIR__ . "/../config/database.php";
   <!-- Include navigation -->
   <?php include 'navigation.php'; ?>
 
-  <?php
-  // Get project ID from URL parameter
-  if (!isset($_GET['id']) || empty($_GET['id'])) {
-    header("Location: projects.php");
-    exit;
-  }
+  <div class="page-content">
+    <?php
+    // Get project ID from URL parameter
+    if (!isset($_GET['id']) || empty($_GET['id'])) {
+      header("Location: projects.php");
+      exit;
+    }
 
-  $projectId = intval($_GET['id']);
-  
-  // Connect to database and fetch project details
-  
-  try {
-    // Fetch project details
-    $stmt = $pdo->prepare("SELECT p.*, u.username FROM projects p JOIN users u ON p.user_id = u.id WHERE p.id = ?");
-    $stmt->execute([$projectId]);
-    $project = $stmt->fetch();
+    $projectId = intval($_GET['id']);
     
-    if (!$project) {
+    // Connect to database and fetch project details
+    
+    try {
+      // Fetch project details
+      $stmt = $pdo->prepare("SELECT p.*, u.username FROM projects p JOIN users u ON p.user_id = u.id WHERE p.id = ?");
+      $stmt->execute([$projectId]);
+      $project = $stmt->fetch();
+      
+      if (!$project) {
+        echo '<div class="max-w-6xl mx-auto my-12 px-4">
+                <div class="bg-red-100 p-6 rounded-lg">
+                  <h1 class="text-2xl font-bold text-red-700">Project not found</h1>
+                  <p class="mt-2">The project you are looking for does not exist.</p>
+                  <a href="projects.php" class="mt-4 inline-block px-6 py-2 text-white rounded" style="background-color: #A7D820;">
+                    Browse Projects
+                  </a>
+                </div>
+              </div>';
+        exit;
+      }
+    
+      // Prepare data for display
+      $title = htmlspecialchars($project['title']);
+      $description = htmlspecialchars($project['description']);
+      $username = htmlspecialchars($project['username']);
+      $created = date('F j, Y', strtotime($project['created_at']));
+      $tags = $project['tags'] ? explode(',', $project['tags']) : [];
+    
+      // Get file path
+      $fileName = htmlspecialchars($project['thumbnail'] ?? '');
+      $filePath = "/gyaanuday/uploads/" . $fileName;
+      $projectFile = "/gyaanuday/uploads/" . htmlspecialchars($project['project_file'] ?? '');
+      
+      $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+      $projectExt = strtolower(pathinfo($project['project_file'] ?? '', PATHINFO_EXTENSION));
+    
+      if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
+        $thumb = $filePath;
+      } else {
+        $thumb = "/gyaanuday/assets/default_icon.png";
+      }
+    
+      // Get like count and check if user has liked this project
+      $likeCount = 0;
+      $hasLiked = false;
+      $hasBookmarked = false;
+    
+      $stmt = $pdo->prepare("SELECT COUNT(*) FROM likes WHERE project_id = ?");
+      $stmt->execute([$projectId]);
+      $likeCount = $stmt->fetchColumn();
+    
+      if (isset($_SESSION['user_id'])) {
+        $stmt = $pdo->prepare("SELECT id FROM likes WHERE user_id = ? AND project_id = ?");
+        $stmt->execute([$_SESSION['user_id'], $projectId]);
+        $hasLiked = $stmt->fetch() ? true : false;
+        
+        // Check if user has bookmarked this project
+        $stmt = $pdo->prepare("SELECT id FROM bookmarks WHERE user_id = ? AND project_id = ?");
+        $stmt->execute([$_SESSION['user_id'], $projectId]);
+        $hasBookmarked = $stmt->fetch() ? true : false;
+      }
+    
+      // Fetch project comments - now including profile_photo
+      $comments = [];
+      $stmt = $pdo->prepare("
+        SELECT c.*, u.username, u.profile_photo
+        FROM comments c 
+        JOIN users u ON c.user_id = u.id 
+        WHERE c.project_id = ? 
+        ORDER BY c.created_at DESC
+      ");
+      $stmt->execute([$projectId]);
+      $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
       echo '<div class="max-w-6xl mx-auto my-12 px-4">
               <div class="bg-red-100 p-6 rounded-lg">
-                <h1 class="text-2xl font-bold text-red-700">Project not found</h1>
-                <p class="mt-2">The project you are looking for does not exist.</p>
-                <a href="projects.php" class="mt-4 inline-block px-6 py-2 text-white rounded" style="background-color: #A7D820;">
-                  Browse Projects
-                </a>
+                <h1 class="text-2xl font-bold text-red-700">Error</h1>
+                <p class="mt-2">An error occurred while retrieving project data.</p>
+                <p class="text-sm text-red-700">' . $e->getMessage() . '</p>
               </div>
             </div>';
       exit;
     }
-  
-    // Prepare data for display
-    $title = htmlspecialchars($project['title']);
-    $description = htmlspecialchars($project['description']);
-    $username = htmlspecialchars($project['username']);
-    $created = date('F j, Y', strtotime($project['created_at']));
-    $tags = $project['tags'] ? explode(',', $project['tags']) : [];
-  
-    // Get file path
-    $fileName = htmlspecialchars($project['thumbnail'] ?? '');
-    $filePath = "/gyaanuday/uploads/" . $fileName;
-    $projectFile = "/gyaanuday/uploads/" . htmlspecialchars($project['project_file'] ?? '');
-    
-    $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-    $projectExt = strtolower(pathinfo($project['project_file'] ?? '', PATHINFO_EXTENSION));
-  
-    if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
-      $thumb = $filePath;
-    } else {
-      $thumb = "/gyaanuday/assets/default_icon.png";
-    }
-  
-    // Get like count and check if user has liked this project
-    $likeCount = 0;
-    $hasLiked = false;
-    $hasBookmarked = false;
-  
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM likes WHERE project_id = ?");
-    $stmt->execute([$projectId]);
-    $likeCount = $stmt->fetchColumn();
-  
-    if (isset($_SESSION['user_id'])) {
-      $stmt = $pdo->prepare("SELECT id FROM likes WHERE user_id = ? AND project_id = ?");
-      $stmt->execute([$_SESSION['user_id'], $projectId]);
-      $hasLiked = $stmt->fetch() ? true : false;
-      
-      // Check if user has bookmarked this project
-      $stmt = $pdo->prepare("SELECT id FROM bookmarks WHERE user_id = ? AND project_id = ?");
-      $stmt->execute([$_SESSION['user_id'], $projectId]);
-      $hasBookmarked = $stmt->fetch() ? true : false;
-    }
-  
-    // Fetch project comments - now including profile_photo
-    $comments = [];
-    $stmt = $pdo->prepare("
-      SELECT c.*, u.username, u.profile_photo
-      FROM comments c 
-      JOIN users u ON c.user_id = u.id 
-      WHERE c.project_id = ? 
-      ORDER BY c.created_at DESC
-    ");
-    $stmt->execute([$projectId]);
-    $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
-  } catch (Exception $e) {
-    echo '<div class="max-w-6xl mx-auto my-12 px-4">
-            <div class="bg-red-100 p-6 rounded-lg">
-              <h1 class="text-2xl font-bold text-red-700">Error</h1>
-              <p class="mt-2">An error occurred while retrieving project data.</p>
-              <p class="text-sm text-red-700">' . $e->getMessage() . '</p>
-            </div>
-          </div>';
-    exit;
-  }
-  ?>
+    ?>
 
-  <div class="max-w-6xl mx-auto my-12 px-4">
-    <!-- Project Header -->
-    <div class="flex flex-wrap justify-between items-start mb-12 project-header pb-5">
-      <div class="w-full md:w-3/4 mb-4 md:mb-0">
-        <div class="flex items-center flex-wrap">
-          <h1 class="text-[36px] leading-[48px] font-archivo font-bold text-[#171a1f] mb-3 mr-4"><?php echo $title; ?></h1>
-          <!-- Like and Bookmark Buttons beside title -->
-          <div class="flex gap-2 items-center my-3">
-            <button id="likeButton" class="like-btn <?php echo $hasLiked ? 'liked' : ''; ?>" data-project-id="<?php echo $projectId; ?>">
-              <i class="<?php echo $hasLiked ? 'fas' : 'far'; ?> fa-heart"></i>
-              <span class="like-count ml-1"><?php echo $likeCount; ?> <?php echo $likeCount == 1 ? 'like' : 'likes'; ?></span>
-            </button>
-            <button id="bookmarkButton" class="bookmark-btn <?php echo $hasBookmarked ? 'bookmarked' : ''; ?>" data-project-id="<?php echo $projectId; ?>">
-              <i class="<?php echo $hasBookmarked ? 'fas' : 'far'; ?> fa-bookmark"></i>
-              <span class="bookmark-count ml-1"><?php echo $hasBookmarked ? 'Saved' : 'Save'; ?></span>
-            </button>
-          </div>
-        </div>
-        <div class="flex flex-wrap items-center text-[#565d6d] mb-4">
-          <div class="project-meta-item">
-            <i class="fas fa-user"></i>
-            <span><?php echo $username; ?></span>
-          </div>
-          <div class="project-meta-item">
-            <i class="fas fa-calendar"></i>
-            <span><?php echo $created; ?></span>
-          </div>
-          <div class="project-meta-item">
-            <i class="fas fa-file"></i>
-            <span class="uppercase"><?php echo $projectExt; ?></span>
-          </div>
-        </div>
-      </div>
-      <div class="w-full md:w-1/4 flex justify-center md:justify-end">
-        <a href="<?php echo $projectFile; ?>" download class="px-6 py-3 rounded-full text-white button-hover shadow-md inline-block bg-[#A7D820]">
-          <i class="fas fa-download mr-2"></i> Download
-        </a>
-      </div>
-    </div>
-
-    <!-- Project Content -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Left Column - Thumbnail and Details -->
-      <div class="lg:col-span-2">
-        <div class="rounded-lg overflow-hidden shadow-md mb-6 card">
-          <img src="<?php echo $thumb; ?>" alt="<?php echo $title; ?>" class="w-full h-auto max-h-96 object-cover">
-        </div>
-        
-        <div class="bg-white rounded-lg p-6 border border-[#e5e7eb] card relative">
-          <!-- Remove the like button from here -->
-          
-          <h2 class="text-2xl font-bold mb-4 text-[#171a1f] font-archivo">Description</h2>
-          <p class="text-[#565d6d] text-[16px] leading-[26px] mb-6"><?php echo nl2br($description); ?></p>
-          
-          <!-- Project Content Preview Based on File Type -->
-          <?php if (in_array($projectExt, ['jpg', 'jpeg', 'png', 'gif'])): ?>
-            <h2 class="text-xl font-semibold mt-8 mb-4 text-[#171a1f] font-archivo">Project Preview</h2>
-            <img src="<?php echo $projectFile; ?>" alt="Project Preview" class="w-full h-auto rounded-lg">
-          <?php elseif ($projectExt === 'pdf'): ?>
-            <h2 class="text-xl font-semibold mt-8 mb-4 text-[#171a1f] font-archivo">PDF Preview</h2>
-            <div class="rounded-lg overflow-hidden border border-gray-300">
-              <object data="<?php echo $projectFile; ?>" type="application/pdf" width="100%" height="500px">
-                <p>Unable to display PDF. <a href="<?php echo $projectFile; ?>" download>Download</a> instead.</p>
-              </object>
-            </div>
-          <?php elseif (in_array($projectExt, ['mp4', 'webm', 'ogg'])): ?>
-            <h2 class="text-xl font-semibold mt-8 mb-4 text-[#171a1f] font-archivo">Video Preview</h2>
-            <video controls class="w-full rounded-lg">
-              <source src="<?php echo $projectFile; ?>" type="video/<?php echo $projectExt; ?>">
-              Your browser does not support the video tag.
-            </video>
-          <?php endif; ?>
-        </div>
-      </div>
-      
-      <!-- Right Column - Additional Info -->
-      <div>
-        <!-- Project Info Card -->
-        <div class="bg-white rounded-lg p-6 border border-[#e5e7eb] mb-6 card">
-          <h2 class="text-xl font-semibold mb-4 text-[#171a1f] font-archivo border-b pb-3">Project Details</h2>
-          <div class="space-y-5 mt-4">
-            <div class="flex items-center">
-              <div class="bg-gray-100 rounded-full p-3 mr-3">
-                <i class="fas fa-user text-[#A7D820]"></i>
-              </div>
-              <div>
-                <h3 class="text-sm font-medium text-[#9095a1]">CREATED BY</h3>
-                <p class="text-[#171a1f] font-medium"><?php echo $username; ?></p>
-              </div>
-            </div>
-            <div class="flex items-center">
-              <div class="bg-gray-100 rounded-full p-3 mr-3">
-                <i class="fas fa-calendar text-[#A7D820]"></i>
-              </div>
-              <div>
-                <h3 class="text-sm font-medium text-[#9095a1]">DATE UPLOADED</h3>
-                <p class="text-[#171a1f] font-medium"><?php echo $created; ?></p>
-              </div>
-            </div>
-            <div class="flex items-center">
-              <div class="bg-gray-100 rounded-full p-3 mr-3">
-                <i class="fas fa-file text-[#A7D820]"></i>
-              </div>
-              <div>
-                <h3 class="text-sm font-medium text-[#9095a1]">FILE TYPE</h3>
-                <p class="text-[#171a1f] font-medium uppercase"><?php echo $projectExt; ?></p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Tags Card -->
-        <div class="bg-white rounded-lg p-6 border border-[#e5e7eb] card">
-          <h2 class="text-xl font-semibold mb-4 text-[#171a1f] font-archivo border-b pb-3">Tags</h2>
-          <div class="mt-4">
-            <?php foreach ($tags as $tag): ?>
-              <?php if(trim($tag) !== ''): ?>
-                <span class="tag"><?php echo htmlspecialchars(trim($tag)); ?></span>
-              <?php endif; ?>
-            <?php endforeach; ?>
-          </div>
-        </div>
-
-        <!-- Related Projects - Could be implemented in the future -->
-      </div>
-    </div>
-
-    <!-- Comment Section -->
-    <div class="mt-12">
-      <h2 class="text-2xl font-bold mb-6 text-[#171a1f] font-archivo border-b pb-3">Comments</h2>
-      
-      <!-- Comment Form -->
-      <div class="bg-white rounded-lg p-6 border border-[#e5e7eb] card mb-6">
-        <?php if (isset($_SESSION['user_id'])): ?>
-          <form id="commentForm" class="space-y-4">
-            <input type="hidden" name="project_id" value="<?php echo $projectId; ?>">
-            <div>
-              <label for="comment" class="block text-sm font-medium text-gray-700 mb-1">Add a comment</label>
-              <textarea 
-                id="comment" 
-                name="comment" 
-                rows="3" 
-                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#A7D820] focus:border-[#A7D820]"
-                placeholder="Share your thoughts on this project..."
-                required
-              ></textarea>
-            </div>
-            <div class="flex justify-end">
-              <button 
-                type="submit" 
-                class="px-4 py-2 bg-[#A7D820] text-white rounded-md hover:bg-[#95c41f] focus:outline-none focus:ring-2 focus:ring-[#A7D820] focus:ring-offset-2 transition-all button-hover"
-              >
-                Post Comment
+    <div class="max-w-6xl mx-auto my-12 px-4">
+      <!-- Project Header -->
+      <div class="flex flex-wrap justify-between items-start mb-12 project-header pb-5">
+        <div class="w-full md:w-3/4 mb-4 md:mb-0">
+          <div class="flex items-center flex-wrap">
+            <h1 class="text-[36px] leading-[48px] font-archivo font-bold text-[#171a1f] mb-3 mr-4"><?php echo $title; ?></h1>
+            <!-- Like and Bookmark Buttons beside title -->
+            <div class="flex gap-2 items-center my-3">
+              <button id="likeButton" class="like-btn <?php echo $hasLiked ? 'liked' : ''; ?>" data-project-id="<?php echo $projectId; ?>">
+                <i class="<?php echo $hasLiked ? 'fas' : 'far'; ?> fa-heart"></i>
+                <span class="like-count ml-1"><?php echo $likeCount; ?> <?php echo $likeCount == 1 ? 'like' : 'likes'; ?></span>
+              </button>
+              <button id="bookmarkButton" class="bookmark-btn <?php echo $hasBookmarked ? 'bookmarked' : ''; ?>" data-project-id="<?php echo $projectId; ?>">
+                <i class="<?php echo $hasBookmarked ? 'fas' : 'far'; ?> fa-bookmark"></i>
+                <span class="bookmark-count ml-1"><?php echo $hasBookmarked ? 'Saved' : 'Save'; ?></span>
               </button>
             </div>
-          </form>
-        <?php else: ?>
-          <div class="bg-gray-50 p-4 rounded-md text-center">
-            <p class="text-gray-600 mb-2">Please <a href="login.php" class="text-[#A7D820] font-bold">login</a> to leave a comment.</p>
           </div>
-        <?php endif; ?>
-      </div>
-      
-      <!-- Comments List -->
-     <!-- Comments List -->
-<div class="space-y-4" id="commentsContainer">
-  <?php if (count($comments) > 0): ?>
-    <?php foreach ($comments as $comment): ?>
-      <div class="bg-white rounded-lg p-6 border border-[#e5e7eb] card">
-        <div class="flex items-start space-x-4">
-          <div class="flex-shrink-0">
-            <?php if (!empty($comment['profile_photo'])): ?>
-              <img class="h-12 w-12 rounded-full object-cover profile-img" 
-                   src="/gyaanuday/uploads/profile_photos/<?php echo htmlspecialchars($comment['profile_photo']); ?>" 
-                   alt="<?php echo htmlspecialchars($comment['username']); ?>">
-            <?php else: ?>
-              <div class="h-12 w-12 rounded-full bg-[#A7D820] flex items-center justify-center text-white font-bold text-lg profile-initial">
-                <?php echo strtoupper(substr(htmlspecialchars($comment['username']), 0, 1)); ?>
-              </div>
-            <?php endif; ?>
-          </div>
-          <div class="flex-grow">
-            <div class="flex justify-between items-center mb-1">
-              <h3 class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($comment['username']); ?></h3>
-              <p class="text-xs text-gray-500"><?php echo date('M j, Y \a\t g:i a', strtotime($comment['created_at'])); ?></p>
+          <div class="flex flex-wrap items-center text-[#565d6d] mb-4">
+            <div class="project-meta-item">
+              <i class="fas fa-user"></i>
+              <span><?php echo $username; ?></span>
             </div>
-            <p class="text-gray-700"><?php echo nl2br(htmlspecialchars($comment['comment'])); ?></p>
+            <div class="project-meta-item">
+              <i class="fas fa-calendar"></i>
+              <span><?php echo $created; ?></span>
+            </div>
+            <div class="project-meta-item">
+              <i class="fas fa-file"></i>
+              <span class="uppercase"><?php echo $projectExt; ?></span>
+            </div>
           </div>
         </div>
+        <div class="w-full md:w-1/4 flex justify-center md:justify-end">
+          <a href="<?php echo $projectFile; ?>" download class="px-6 py-3 rounded-full text-white button-hover shadow-md inline-block bg-[#A7D820]">
+            <i class="fas fa-download mr-2"></i> Download
+          </a>
+        </div>
       </div>
-    <?php endforeach; ?>
-  <?php else: ?>
-    <p class="text-sm text-gray-500">No comments yet.</p>
-  <?php endif; ?>
-</div>
+
+      <!-- Project Content -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Column - Thumbnail and Details -->
+        <div class="lg:col-span-2">
+          <div class="rounded-lg overflow-hidden shadow-md mb-6 card">
+            <img src="<?php echo $thumb; ?>" alt="<?php echo $title; ?>" class="w-full h-auto max-h-96 object-cover">
+          </div>
+          
+          <div class="bg-white rounded-lg p-6 border border-[#e5e7eb] card relative">
+            <!-- Remove the like button from here -->
+            
+            <h2 class="text-2xl font-bold mb-4 text-[#171a1f] font-archivo">Description</h2>
+            <p class="text-[#565d6d] text-[16px] leading-[26px] mb-6"><?php echo nl2br($description); ?></p>
+            
+            <!-- Project Content Preview Based on File Type -->
+            <?php if (in_array($projectExt, ['jpg', 'jpeg', 'png', 'gif'])): ?>
+              <h2 class="text-xl font-semibold mt-8 mb-4 text-[#171a1f] font-archivo">Project Preview</h2>
+              <img src="<?php echo $projectFile; ?>" alt="Project Preview" class="w-full h-auto rounded-lg">
+            <?php elseif ($projectExt === 'pdf'): ?>
+              <h2 class="text-xl font-semibold mt-8 mb-4 text-[#171a1f] font-archivo">PDF Preview</h2>
+              <div class="rounded-lg overflow-hidden border border-gray-300">
+                <object data="<?php echo $projectFile; ?>" type="application/pdf" width="100%" height="500px">
+                  <p>Unable to display PDF. <a href="<?php echo $projectFile; ?>" download>Download</a> instead.</p>
+                </div>
+              </object>
+            <?php elseif (in_array($projectExt, ['mp4', 'webm', 'ogg'])): ?>
+              <h2 class="text-xl font-semibold mt-8 mb-4 text-[#171a1f] font-archivo">Video Preview</h2>
+              <video controls class="w-full rounded-lg">
+                <source src="<?php echo $projectFile; ?>" type="video/<?php echo $projectExt; ?>">
+                Your browser does not support the video tag.
+              </video>
+            <?php endif; ?>
+          </div>
+        </div>
+        
+        <!-- Right Column - Additional Info -->
+        <div>
+          <!-- Project Info Card -->
+          <div class="bg-white rounded-lg p-6 border border-[#e5e7eb] mb-6 card">
+            <h2 class="text-xl font-semibold mb-4 text-[#171a1f] font-archivo border-b pb-3">Project Details</h2>
+            <div class="space-y-5 mt-4">
+              <div class="flex items-center">
+                <div class="bg-gray-100 rounded-full p-3 mr-3">
+                  <i class="fas fa-user text-[#A7D820]"></i>
+                </div>
+                <div>
+                  <h3 class="text-sm font-medium text-[#9095a1]">CREATED BY</h3>
+                  <p class="text-[#171a1f] font-medium"><?php echo $username; ?></p>
+                </div>
+              </div>
+              <div class="flex items-center">
+                <div class="bg-gray-100 rounded-full p-3 mr-3">
+                  <i class="fas fa-calendar text-[#A7D820]"></i>
+                </div>
+                <div>
+                  <h3 class="text-sm font-medium text-[#9095a1]">DATE UPLOADED</h3>
+                  <p class="text-[#171a1f] font-medium"><?php echo $created; ?></p>
+                </div>
+              </div>
+              <div class="flex items-center">
+                <div class="bg-gray-100 rounded-full p-3 mr-3">
+                  <i class="fas fa-file text-[#A7D820]"></i>
+                </div>
+                <div>
+                  <h3 class="text-sm font-medium text-[#9095a1]">FILE TYPE</h3>
+                  <p class="text-[#171a1f] font-medium uppercase"><?php echo $projectExt; ?></p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Tags Card -->
+          <div class="bg-white rounded-lg p-6 border border-[#e5e7eb] card">
+            <h2 class="text-xl font-semibold mb-4 text-[#171a1f] font-archivo border-b pb-3">Tags</h2>
+            <div class="mt-4">
+              <?php foreach ($tags as $tag): ?>
+                <?php if(trim($tag) !== ''): ?>
+                  <span class="tag"><?php echo htmlspecialchars(trim($tag)); ?></span>
+                <?php endif; ?>
+              <?php endforeach; ?>
+            </div>
+          </div>
+
+          <!-- Related Projects - Could be implemented in the future -->
+        </div>
+      </div>
+
+      <!-- Comment Section -->
+      <div class="mt-12">
+        <h2 class="text-2xl font-bold mb-6 text-[#171a1f] font-archivo border-b pb-3">Comments</h2>
+        
+        <!-- Comment Form -->
+        <div class="bg-white rounded-lg p-6 border border-[#e5e7eb] card mb-6">
+          <?php if (isset($_SESSION['user_id'])): ?>
+            <form id="commentForm" class="space-y-4">
+              <input type="hidden" name="project_id" value="<?php echo $projectId; ?>">
+              <div>
+                <label for="comment" class="block text-sm font-medium text-gray-700 mb-1">Add a comment</label>
+                <textarea 
+                  id="comment" 
+                  name="comment" 
+                  rows="3" 
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#A7D820] focus:border-[#A7D820]"
+                  placeholder="Share your thoughts on this project..."
+                  required
+                ></textarea>
+              </div>
+              <div class="flex justify-end">
+                <button 
+                  type="submit" 
+                  class="px-4 py-2 bg-[#A7D820] text-white rounded-md hover:bg-[#95c41f] focus:outline-none focus:ring-2 focus:ring-[#A7D820] focus:ring-offset-2 transition-all button-hover"
+                >
+                  Post Comment
+                </button>
+              </div>
+            </form>
+          <?php else: ?>
+            <div class="bg-gray-50 p-4 rounded-md text-center">
+              <p class="text-gray-600 mb-2">Please <a href="login.php" class="text-[#A7D820] font-bold">login</a> to leave a comment.</p>
+            </div>
+          <?php endif; ?>
+        </div>
+        
+        <!-- Comments List -->
+       <!-- Comments List -->
+  <div class="space-y-4" id="commentsContainer">
+    <?php if (count($comments) > 0): ?>
+      <?php foreach ($comments as $comment): ?>
+        <div class="bg-white rounded-lg p-6 border border-[#e5e7eb] card">
+          <div class="flex items-start space-x-4">
+            <div class="flex-shrink-0">
+              <?php if (!empty($comment['profile_photo'])): ?>
+                <img class="h-12 w-12 rounded-full object-cover profile-img" 
+                     src="/gyaanuday/uploads/profile_photos/<?php echo htmlspecialchars($comment['profile_photo']); ?>" 
+                     alt="<?php echo htmlspecialchars($comment['username']); ?>">
+              <?php else: ?>
+                <div class="h-12 w-12 rounded-full bg-[#A7D820] flex items-center justify-center text-white font-bold text-lg profile-initial">
+                  <?php echo strtoupper(substr(htmlspecialchars($comment['username']), 0, 1)); ?>
+                </div>
+              <?php endif; ?>
+            </div>
+            <div class="flex-grow">
+              <div class="flex justify-between items-center mb-1">
+                <h3 class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($comment['username']); ?></h3>
+                <p class="text-xs text-gray-500"><?php echo date('M j, Y \a\t g:i a', strtotime($comment['created_at'])); ?></p>
+              </div>
+              <p class="text-gray-700"><?php echo nl2br(htmlspecialchars($comment['comment'])); ?></p>
+            </div>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    <?php else: ?>
+      <p class="text-sm text-gray-500">No comments yet.</p>
+    <?php endif; ?>
+  </div>
 
 
+    </div>
   </div>
 
   <?php include 'components/footer.php'; ?>
