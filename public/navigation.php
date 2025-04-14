@@ -24,27 +24,20 @@ if ($isLoggedIn && isset($pdo)) {
 ?>
 
 <!-- Search Overlay -->
-<div class="search-overlay" id="searchOverlay">
+<div id="searchOverlay" class="search-overlay">
   <div class="search-container">
-    <button class="absolute top-8 right-8 text-2xl text-gray-600 hover:text-gray-900" id="closeSearch">
-      <i class="fas fa-times"></i>
-    </button>
-    <h2 class="text-2xl font-archivo font-bold text-center mb-6">Search Projects</h2>
-    <form action="search_results.php" method="GET" class="flex flex-col gap-4">
-      <div class="relative">
-        <input 
-          type="text" 
-          name="q" 
-          placeholder="Search by title, tags..." 
-          class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#A7D820] focus:border-transparent outline-none text-lg"
-          autocomplete="off"
-          required
-        >
-        <button type="submit" class="absolute right-3 top-3 text-gray-400 hover:text-[#A7D820]">
-          <i class="fas fa-search fa-lg"></i>
+    <div class="search-header flex justify-between items-center">
+      <h2 class="text-2xl font-bold font-archivo">Search Projects</h2>
+      <i id="closeSearch" class="fas fa-times cursor-pointer text-xl p-2 hover:text-gray-600"></i>
+    </div>
+    <form action="search_results.php" method="GET" class="w-full">
+      <div class="flex">
+        <input type="text" name="q" placeholder="Search for projects..." class="w-full p-3 border border-[#bdc1ca] rounded-l-lg focus:outline-none focus:border-[#A7D820]">
+        <button type="submit" class="bg-[#A7D820] text-white px-5 rounded-r-lg">
+          <i class="fas fa-search"></i>
         </button>
       </div>
-      <p class="text-sm text-gray-500 text-center">Press Enter to search or ESC to close</p>
+      <p class="text-sm text-gray-500 text-center mt-2">Press Enter to search or ESC to close</p>
     </form>
   </div>
 </div>

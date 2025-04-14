@@ -372,8 +372,9 @@ require_once __DIR__ . "/../config/database.php";
             <img src="<?php echo $thumb; ?>" alt="<?php echo $title; ?>" class="w-full h-auto max-h-96 object-cover">
           </div>
           
-          <div class="bg-white rounded-lg p-6 border border-[#e5e7eb] card relative mb-6">
-            <!-- Project Description -->
+          <div class="bg-white rounded-lg p-6 border border-[#e5e7eb] card relative">
+            <!-- Remove the like button from here -->
+            
             <h2 class="text-2xl font-bold mb-4 text-[#171a1f] font-archivo">Description</h2>
             <p class="text-[#565d6d] text-[16px] leading-[26px] mb-6"><?php echo nl2br($description); ?></p>
             
@@ -386,8 +387,8 @@ require_once __DIR__ . "/../config/database.php";
               <div class="rounded-lg overflow-hidden border border-gray-300">
                 <object data="<?php echo $projectFile; ?>" type="application/pdf" width="100%" height="500px">
                   <p>Unable to display PDF. <a href="<?php echo $projectFile; ?>" download>Download</a> instead.</p>
-                </object>
-              </div>
+                </div>
+              </object>
             <?php elseif (in_array($projectExt, ['mp4', 'webm', 'ogg'])): ?>
               <h2 class="text-xl font-semibold mt-8 mb-4 text-[#171a1f] font-archivo">Video Preview</h2>
               <video controls class="w-full rounded-lg">
@@ -395,75 +396,6 @@ require_once __DIR__ . "/../config/database.php";
                 Your browser does not support the video tag.
               </video>
             <?php endif; ?>
-          </div>
-          
-          <!-- Comment Section - Moved here to ensure consistent layout across all file types -->
-          <div class="bg-white rounded-lg p-6 border border-[#e5e7eb] card">
-            <h2 class="text-2xl font-bold mb-6 text-[#171a1f] font-archivo border-b pb-3">Comments</h2>
-            
-            <!-- Comment Form -->
-            <div class="mb-6">
-              <?php if (isset($_SESSION['user_id'])): ?>
-                <form id="commentForm" class="space-y-4">
-                  <input type="hidden" name="project_id" value="<?php echo $projectId; ?>">
-                  <div>
-                    <label for="comment" class="block text-sm font-medium text-gray-700 mb-1">Add a comment</label>
-                    <textarea 
-                      id="comment" 
-                      name="comment" 
-                      rows="3" 
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#A7D820] focus:border-[#A7D820]"
-                      placeholder="Share your thoughts on this project..."
-                      required
-                    ></textarea>
-                  </div>
-                  <div class="flex justify-end">
-                    <button 
-                      type="submit" 
-                      class="px-4 py-2 bg-[#A7D820] text-white rounded-md hover:bg-[#95c41f] focus:outline-none focus:ring-2 focus:ring-[#A7D820] focus:ring-offset-2 transition-all button-hover"
-                    >
-                      Post Comment
-                    </button>
-                  </div>
-                </form>
-              <?php else: ?>
-                <div class="bg-gray-50 p-4 rounded-md text-center">
-                  <p class="text-gray-600 mb-2">Please <a href="login.php" class="text-[#A7D820] font-bold">login</a> to leave a comment.</p>
-                </div>
-              <?php endif; ?>
-            </div>
-            
-            <!-- Comments List -->
-            <div class="space-y-4" id="commentsContainer">
-              <?php if (count($comments) > 0): ?>
-                <?php foreach ($comments as $comment): ?>
-                  <div class="bg-white rounded-lg p-6 border border-[#e5e7eb] card">
-                    <div class="flex items-start space-x-4">
-                      <div class="flex-shrink-0">
-                        <?php if (!empty($comment['profile_photo'])): ?>
-                          <img class="h-12 w-12 rounded-full object-cover profile-img" 
-                               src="/gyaanuday/uploads/profile_photos/<?php echo htmlspecialchars($comment['profile_photo']); ?>" 
-                               alt="<?php echo htmlspecialchars($comment['username']); ?>">
-                        <?php else: ?>
-                          <div class="h-12 w-12 rounded-full bg-[#A7D820] flex items-center justify-center text-white font-bold text-lg profile-initial">
-                            <?php echo strtoupper(substr(htmlspecialchars($comment['username']), 0, 1)); ?>
-                          </div>
-                        <?php endif; ?>
-                      </div>
-                      <div class="flex-grow">
-                        <div class="flex justify-between items-center mb-1">
-                          <h3 class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($comment['username']); ?></h3>
-                          <p class="text-xs text-gray-500"><?php echo date('M j, Y \a\t g:i a', strtotime($comment['created_at'])); ?></p>
-                        </div>
-                        <p class="text-gray-700"><?php echo nl2br(htmlspecialchars($comment['comment'])); ?></p>
-                      </div>
-                    </div>
-                  </div>
-                <?php endforeach; ?>
-              <?php else: ?>
-                <p class="text-sm text-gray-500">No comments yet.</p>
-              <?php endif; ?>
-            </div>
           </div>
         </div>
         
@@ -518,6 +450,76 @@ require_once __DIR__ . "/../config/database.php";
           <!-- Related Projects - Could be implemented in the future -->
         </div>
       </div>
+
+      <!-- Comment Section -->
+      <div class="mt-12">
+        <h2 class="text-2xl font-bold mb-6 text-[#171a1f] font-archivo border-b pb-3">Comments</h2>
+        
+        <!-- Comment Form -->
+        <div class="bg-white rounded-lg p-6 border border-[#e5e7eb] card mb-6">
+          <?php if (isset($_SESSION['user_id'])): ?>
+            <form id="commentForm" class="space-y-4">
+              <input type="hidden" name="project_id" value="<?php echo $projectId; ?>">
+              <div>
+                <label for="comment" class="block text-sm font-medium text-gray-700 mb-1">Add a comment</label>
+                <textarea 
+                  id="comment" 
+                  name="comment" 
+                  rows="3" 
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#A7D820] focus:border-[#A7D820]"
+                  placeholder="Share your thoughts on this project..."
+                  required
+                ></textarea>
+              </div>
+              <div class="flex justify-end">
+                <button 
+                  type="submit" 
+                  class="px-4 py-2 bg-[#A7D820] text-white rounded-md hover:bg-[#95c41f] focus:outline-none focus:ring-2 focus:ring-[#A7D820] focus:ring-offset-2 transition-all button-hover"
+                >
+                  Post Comment
+                </button>
+              </div>
+            </form>
+          <?php else: ?>
+            <div class="bg-gray-50 p-4 rounded-md text-center">
+              <p class="text-gray-600 mb-2">Please <a href="login.php" class="text-[#A7D820] font-bold">login</a> to leave a comment.</p>
+            </div>
+          <?php endif; ?>
+        </div>
+        
+        <!-- Comments List -->
+       <!-- Comments List -->
+  <div class="space-y-4" id="commentsContainer">
+    <?php if (count($comments) > 0): ?>
+      <?php foreach ($comments as $comment): ?>
+        <div class="bg-white rounded-lg p-6 border border-[#e5e7eb] card">
+          <div class="flex items-start space-x-4">
+            <div class="flex-shrink-0">
+              <?php if (!empty($comment['profile_photo'])): ?>
+                <img class="h-12 w-12 rounded-full object-cover profile-img" 
+                     src="/gyaanuday/uploads/profile_photos/<?php echo htmlspecialchars($comment['profile_photo']); ?>" 
+                     alt="<?php echo htmlspecialchars($comment['username']); ?>">
+              <?php else: ?>
+                <div class="h-12 w-12 rounded-full bg-[#A7D820] flex items-center justify-center text-white font-bold text-lg profile-initial">
+                  <?php echo strtoupper(substr(htmlspecialchars($comment['username']), 0, 1)); ?>
+                </div>
+              <?php endif; ?>
+            </div>
+            <div class="flex-grow">
+              <div class="flex justify-between items-center mb-1">
+                <h3 class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($comment['username']); ?></h3>
+                <p class="text-xs text-gray-500"><?php echo date('M j, Y \a\t g:i a', strtotime($comment['created_at'])); ?></p>
+              </div>
+              <p class="text-gray-700"><?php echo nl2br(htmlspecialchars($comment['comment'])); ?></p>
+            </div>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    <?php else: ?>
+      <p class="text-sm text-gray-500">No comments yet.</p>
+    <?php endif; ?>
+  </div>
+
 
     </div>
   </div>
