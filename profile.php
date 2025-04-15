@@ -1,10 +1,10 @@
 <?php
 // Start session and include database at the very beginning
 session_start();
-require_once __DIR__ . "/../config/database.php";
+require_once __DIR__ . "/config/database.php";
 
 // Initialize photo_url with a better default value
-$photo_url = "./images/default_profile.jpeg";  // Changed default avatar pathth
+$photo_url = "./images/default_profile.jpeg";  // Changed default avatar path
 
 // Get user data if logged in
 if (isset($_SESSION['user_id'])) {
@@ -25,11 +25,11 @@ if (isset($_SESSION['user_id'])) {
         
         // Use consistent path handling with the upload path in update_profile.php
         if (!empty($profile_photo)) {
-            $photo_path = __DIR__ . "/../uploads/profile_photos/" . $profile_photo;
+            $photo_path = __DIR__ . "/uploads/profile_photos/" . $profile_photo;
             
             // Use relative path for browser display
             if (file_exists($photo_path)) {
-                $photo_url = "../uploads/profile_photos/" . $profile_photo;
+                $photo_url = "./uploads/profile_photos/" . $profile_photo;
             }
         }
     }
@@ -173,7 +173,7 @@ $debug = false;
                 <div class="border-t border-gray-200 pt-8">
                     <h2 class="text-2xl mb-6 font-archivo text-[#171a1f]">Update Your Profile</h2>
                     
-                    <form action="../src/auth/update_profile.php" method="POST" enctype="multipart/form-data" class="space-y-6">
+                    <form action="src/auth/update_profile.php" method="POST" enctype="multipart/form-data" class="space-y-6">
                         <!-- Username readonly field - showing the username but not allowing edits -->
                         <div>
                             <label for="username-display" class="block text-sm font-medium text-gray-700 mb-2">Username</label>
@@ -327,7 +327,7 @@ $debug = false;
         } else {
             echo '<div class="text-center py-8 text-gray-500" id="noBookmarksMessage">
                 <p>You haven\'t bookmarked any projects yet.</p>
-                <a href="projects.php" class="text-[#A7D820] hover:underline mt-2 inline-block">Browse Projects</a>
+                <a href="explore_projects.php" class="text-[#A7D820] hover:underline mt-2 inline-block">Browse Projects</a>
             </div>';
         }
         ?>
@@ -339,7 +339,7 @@ $debug = false;
             <h2 class="text-2xl font-bold text-red-600 mb-4">Delete Account</h2>
             <p class="mb-6 text-gray-700">Are you sure you want to permanently delete your account? This action cannot be undone and all your data, projects, and activities will be removed.</p>
             
-            <form action="../src/auth/delete_account.php" method="POST" class="space-y-4">
+            <form action="src/auth/delete_account.php" method="POST" class="space-y-4">
                 <div>
                     <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Confirm with your password</label>
                     <input 
@@ -563,7 +563,7 @@ $debug = false;
         
         confirmProjectDelete.addEventListener('click', function() {
             if (currentProjectId) {
-                window.location.href = '../src/projects/delete_project.php?id=' + currentProjectId;
+                window.location.href = 'src/projects/delete_project.php?id=' + currentProjectId;
             }
         });
 
@@ -618,7 +618,7 @@ $debug = false;
                                 <h1 class="text-center text-[32px] text-[#171a1f] font-archivo mb-12 leading-[48px]">Bookmarked Projects</h1>
                                 <div class="text-center py-8 text-gray-500" id="noBookmarksMessage">
                                     <p>You haven't bookmarked any projects yet.</p>
-                                    <a href="projects.php" class="text-[#A7D820] hover:underline mt-2 inline-block">Browse Projects</a>
+                                    <a href="explore_projects.php" class="text-[#A7D820] hover:underline mt-2 inline-block">Browse Projects</a>
                                 </div>
                             `;
                         }

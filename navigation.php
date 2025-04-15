@@ -6,7 +6,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 $isLoggedIn = isset($_SESSION['user_id']);
 
 // Set photo URL if user is logged in
-$photo_url = "/gyaanuday/public/images/default_profile.jpeg";
+$photo_url = "./images/default_profile.jpeg";
 if ($isLoggedIn && isset($pdo)) {
     $user_id = $_SESSION['user_id'];
     $stmt = $pdo->prepare("SELECT profile_photo FROM users WHERE id = ?");
@@ -14,10 +14,10 @@ if ($isLoggedIn && isset($pdo)) {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if ($user && !empty($user['profile_photo'])) {
-        $photo_path = __DIR__ . "/../uploads/profile_photos/" . $user['profile_photo'];
+        $photo_path = __DIR__ . "/uploads/profile_photos/" . $user['profile_photo'];
         
         if (file_exists($photo_path)) {
-            $photo_url = "../uploads/profile_photos/" . $user['profile_photo'];
+            $photo_url = "./uploads/profile_photos/" . $user['profile_photo'];
         }
     }
 }
@@ -101,7 +101,7 @@ if ($isLoggedIn && isset($pdo)) {
               <a href="profile.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
                 <i class="fas fa-user-circle mr-2"></i> My Profile
               </a>
-              <a href="../src/auth/logout.php" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 transition">
+              <a href="src/auth/logout.php" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 transition">
                 <i class="fas fa-sign-out-alt mr-2"></i> Logout
               </a>
             </div>
@@ -139,4 +139,37 @@ if ($isLoggedIn && isset($pdo)) {
     });
   </script>
   <?php endif; ?>
+
+  <!-- Add this script for search overlay functionality -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchButton = document.getElementById('searchButton');
+      const searchOverlay = document.getElementById('searchOverlay');
+      const closeSearch = document.getElementById('closeSearch');
+      
+      // Open search overlay
+      if (searchButton) {
+        searchButton.addEventListener('click', function() {
+          searchOverlay.classList.add('active');
+          setTimeout(() => {
+            document.querySelector('.search-container input').focus();
+          }, 400);
+        });
+      }
+      
+      // Close search overlay
+      if (closeSearch) {
+        closeSearch.addEventListener('click', function() {
+          searchOverlay.classList.remove('active');
+        });
+      }
+      
+      // Close search with ESC key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && searchOverlay.classList.contains('active')) {
+          searchOverlay.classList.remove('active');
+        }
+      });
+    });
+  </script>
 </nav>

@@ -3,6 +3,6 @@
   session_unset();
   session_destroy();
 
-  header("location: /gyaanuday/public/login.php");
+  header("location: ../../login.php");
   exit;
 ?>

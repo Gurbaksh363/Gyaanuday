@@ -1,6 +1,6 @@
 <?php 
 session_start(); 
-require_once __DIR__ . "/../config/database.php";
+require_once __DIR__ . "/config/database.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -135,14 +135,14 @@ require_once __DIR__ . "/../config/database.php";
         <?php foreach ($projects as $project): 
           // Get file path
           $fileName = htmlspecialchars($project['thumbnail']);
-          $filePath = "/gyaanuday/uploads/" . $fileName;
+          $filePath = "./uploads/" . $fileName;
           
           $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
           if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
             $thumb = $filePath;
           } else {
-            $thumb = "/gyaanuday/assets/default_icon.png";
+            $thumb = "./images/thumbnail/Web Development.jpg"; // Default thumbnail
           }
 
           $title = htmlspecialchars($project['title']);

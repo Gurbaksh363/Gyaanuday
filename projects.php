@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once __DIR__ . "/../config/database.php";
+require_once __DIR__ . "/config/database.php";
 
 // Redirect if not logged in
 if (!isset($_SESSION['user_id'])) {
@@ -174,7 +174,7 @@ if (!isset($_SESSION['user_id'])) {
           <h2 class="text-[32px] leading-[48px] font-semibold text-[#171a1f] font-archivo mb-6">Share Your Project
           </h2>
 
-          <form action="/gyaanuday/src/projects/add_project.php" method="POST" enctype="multipart/form-data"
+          <form action="src/projects/add_project.php" method="POST" enctype="multipart/form-data"
             class="space-y-6">
             <div>
               <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Project Title</label>
@@ -242,11 +242,11 @@ if (!isset($_SESSION['user_id'])) {
         <div class="md:w-1/3 bg-gray-50 p-8">
           <h3 class="text-lg font-semibold text-[#171a1f] mb-6">Project Inspiration</h3>
           <div class="gallery-preview grid grid-cols-2 gap-3">
-            <img src="/gyaanuday/public/images/uploadthumbnail/img1.png" class="w-full h-24 object-cover rounded-lg shadow-sm">
-            <img src="/gyaanuday/public/images/uploadthumbnail/img2.png" class="w-full h-24 object-cover rounded-lg shadow-sm">
-            <img src="/gyaanuday/public/images/uploadthumbnail/img3.png" class="w-full h-24 object-cover rounded-lg shadow-sm">
-            <img src="/gyaanuday/public/images/uploadthumbnail/img4.png" class="w-full h-24 object-cover rounded-lg shadow-sm">
-            <img src="/gyaanuday/public/images/uploadthumbnail/img6.png" class="w-full h-24 object-cover rounded-lg shadow-sm">
+            <img src="./images/uploadthumbnail/img1.png" class="w-full h-24 object-cover rounded-lg shadow-sm">
+            <img src="./images/uploadthumbnail/img2.png" class="w-full h-24 object-cover rounded-lg shadow-sm">
+            <img src="./images/uploadthumbnail/img3.png" class="w-full h-24 object-cover rounded-lg shadow-sm">
+            <img src="./images/uploadthumbnail/img4.png" class="w-full h-24 object-cover rounded-lg shadow-sm">
+            <img src="./images/uploadthumbnail/img6.png" class="w-full h-24 object-cover rounded-lg shadow-sm">
           </div>
           <div class="mt-6">
             <p class="text-sm text-gray-600 leading-relaxed">
@@ -276,7 +276,7 @@ if (!isset($_SESSION['user_id'])) {
       foreach ($featured_projects as $project) {
         $projectId = $project['id'];
         $fileName = htmlspecialchars($project['thumbnail']);
-        $filePath = "/gyaanuday/uploads/" . $fileName;
+        $filePath = "./uploads/" . $fileName;
         $title = htmlspecialchars($project['title']);
         $shortDesc = htmlspecialchars(substr($project['description'], 0, 50) . (strlen($project['description']) > 50 ? '...' : ''));
         $tags = !empty($project['tags']) ? explode(',', $project['tags'])[0] : 'Project';
@@ -287,7 +287,7 @@ if (!isset($_SESSION['user_id'])) {
         if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
           $thumb = $filePath;
         } else {
-          $thumb = "/gyaanuday/assets/default_icon.png"; // Default thumbnail
+          $thumb = "./assets/default_icon.png"; // Default thumbnail
         }
         
         echo '<div class="overflow-hidden rounded-lg shadow-lg border border-[#bdc1ca] card-hover">

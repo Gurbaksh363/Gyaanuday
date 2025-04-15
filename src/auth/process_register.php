@@ -10,14 +10,14 @@
     // Basic validation
     if (empty($username) || empty($email) || empty($password)){
       $_SESSION['error'] = "All fields are required.";
-      header("Location: /gyaanuday/public/register.php");
+      header("Location: ../../register.php");
       exit;
     }
     
     // Check password length
     if (strlen($password) < 8) {
       $_SESSION['error'] = "Password must be at least 8 characters long.";
-      header("Location: /gyaanuday/public/register.php");
+      header("Location: ../../register.php");
       exit;
     }
 
@@ -26,7 +26,7 @@
     $stmt->execute([$email]);
     if($stmt->fetch()){
       $_SESSION['error'] = "Email already registered. Please use a different email or login.";
-      header("Location: /gyaanuday/public/register.php");
+      header("Location: ../../register.php");
       exit;
     }
 
@@ -35,7 +35,7 @@
     $stmt->execute([$username]);
     if($stmt->fetch()){
       $_SESSION['error'] = "Username already taken. Please choose a different username.";
-      header("Location: /gyaanuday/public/register.php");
+      header("Location: ../../register.php");
       exit;
     }
 
@@ -48,17 +48,17 @@
     try{
       $stmt->execute([$username, $email, $hashedPassword]);
       $_SESSION['success'] = "Registration successful! You can now log in.";
-      header("Location: /gyaanuday/public/login.php");
+      header("Location: ../../login.php");
       exit;
     }
     catch(\PDOException $e){
       $_SESSION['error'] = "Registration failed. Please try again.";
-      header("Location: /gyaanuday/public/register.php");
+      header("Location: ../../register.php");
       exit;
     }
   } else{
     $_SESSION['error'] = "Invalid request method.";
-    header("Location: /gyaanuday/public/register.php");
+    header("Location: ../../register.php");
     exit;
   }
 ?>

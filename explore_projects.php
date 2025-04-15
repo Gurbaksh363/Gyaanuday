@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once __DIR__ . "/../config/database.php";
+require_once __DIR__ . "/config/database.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -167,7 +167,7 @@ require_once __DIR__ . "/../config/database.php";
   <div class="max-w-7xl mx-auto px-4 pb-12 sm:px-6 lg:px-8">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <?php
-      require_once __DIR__ . "/../config/database.php";
+      require_once __DIR__ . "/config/database.php";
       
       // Determine sorting and filtering
       $category = isset($_GET['category']) ? $_GET['category'] : '';
@@ -209,7 +209,7 @@ require_once __DIR__ . "/../config/database.php";
           foreach ($projects as $project) {
               $projectId = htmlspecialchars($project['id']);
               $fileName = htmlspecialchars($project['thumbnail']);
-              $filePath = "/gyaanuday/uploads/" . $fileName;
+              $filePath = "./uploads/" . $fileName;
               $title = htmlspecialchars($project['title']);
               $description = htmlspecialchars($project['description']);
               $username = htmlspecialchars($project['username']);
@@ -218,10 +218,10 @@ require_once __DIR__ . "/../config/database.php";
               $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
               
               // Determine thumbnail
-              if (in_array($ext, ['jpg', 'jpeg', 'png']) && file_exists($_SERVER['DOCUMENT_ROOT'] . $filePath)) {
+              if (in_array($ext, ['jpg', 'jpeg', 'png']) && file_exists($_SERVER['DOCUMENT_ROOT'] . "/gyaanuday/uploads/" . $fileName)) {
                   $thumb = $filePath;
               } else {
-                  $thumb = "/gyaanuday/assets/default_icon.png";
+                  $thumb = "./assets/default_icon.png";
               }
               
               echo "

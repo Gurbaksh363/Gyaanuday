@@ -5,7 +5,7 @@ require_once __DIR__ . "/../../config/database.php";
 // Check if user is logged in
 if (!isset($_SESSION['user_id']) || !isset($_GET['id']) || empty($_GET['id'])) {
     $_SESSION['error'] = !isset($_SESSION['user_id']) ? "Login required" : "Invalid project ID";
-    header("Location: /gyaanuday/public/" . (!isset($_SESSION['user_id']) ? "login.php" : "profile.php"));
+    header("Location: ../../" . (!isset($_SESSION['user_id']) ? "login.php" : "profile.php"));
     exit;
 }
 
@@ -19,7 +19,7 @@ $project = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$project) {
     $_SESSION['error'] = "Permission denied or project not found";
-    header("Location: /gyaanuday/public/profile.php");
+    header("Location: ../../profile.php");
     exit;
 }
 
@@ -57,6 +57,6 @@ try {
     $_SESSION['error'] = "Error occurred"; // Simplified error message
 }
 
-header("Location: /gyaanuday/public/profile.php");
+header("Location: ../../profile.php");
 exit;
 ?>

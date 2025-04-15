@@ -3,7 +3,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 session_start();
-require_once __DIR__ . "/../config/database.php";
+require_once __DIR__ . "/config/database.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -269,8 +269,8 @@ require_once __DIR__ . "/../config/database.php";
     
       // Get file path
       $fileName = htmlspecialchars($project['thumbnail'] ?? '');
-      $filePath = "/gyaanuday/uploads/" . $fileName;
-      $projectFile = "/gyaanuday/uploads/" . htmlspecialchars($project['project_file'] ?? '');
+      $filePath = "./uploads/" . $fileName;
+      $projectFile = "./uploads/" . htmlspecialchars($project['project_file'] ?? '');
       
       $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
       $projectExt = strtolower(pathinfo($project['project_file'] ?? '', PATHINFO_EXTENSION));
@@ -278,7 +278,7 @@ require_once __DIR__ . "/../config/database.php";
       if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
         $thumb = $filePath;
       } else {
-        $thumb = "/gyaanuday/assets/default_icon.png";
+        $thumb = "./assets/default_icon.png";
       }
     
       // Get like count and check if user has liked this project
@@ -497,7 +497,7 @@ require_once __DIR__ . "/../config/database.php";
             <div class="flex-shrink-0">
               <?php if (!empty($comment['profile_photo'])): ?>
                 <img class="h-12 w-12 rounded-full object-cover profile-img" 
-                     src="/gyaanuday/uploads/profile_photos/<?php echo htmlspecialchars($comment['profile_photo']); ?>" 
+                     src="./uploads/profile_photos/<?php echo htmlspecialchars($comment['profile_photo']); ?>" 
                      alt="<?php echo htmlspecialchars($comment['username']); ?>">
               <?php else: ?>
                 <div class="h-12 w-12 rounded-full bg-[#A7D820] flex items-center justify-center text-white font-bold text-lg profile-initial">
@@ -595,7 +595,7 @@ require_once __DIR__ . "/../config/database.php";
         const formData = new FormData();
         formData.append('project_id', projectId);
         
-        fetch('/gyaanuday/src/projects/like_project.php', {
+        fetch('./src/projects/like_project.php', {
           method: 'POST',
           body: formData
         })
@@ -640,7 +640,7 @@ require_once __DIR__ . "/../config/database.php";
         const formData = new FormData();
         formData.append('project_id', projectId);
         
-        fetch('/gyaanuday/src/projects/bookmark_project.php', {
+        fetch('./src/projects/bookmark_project.php', {
           method: 'POST',
           body: formData
         })
@@ -694,7 +694,7 @@ require_once __DIR__ . "/../config/database.php";
         formData.append('project_id', projectId);
         formData.append('comment', comment);
         
-        fetch('/gyaanuday/src/projects/add_comment.php', {
+        fetch('./src/projects/add_comment.php', {
           method: 'POST',
           body: formData
         })
@@ -726,7 +726,7 @@ require_once __DIR__ . "/../config/database.php";
             // Profile image handling with border
             let profileHtml;
             if (data.profile_photo) {
-              profileHtml = `<img class="h-12 w-12 rounded-full object-cover profile-img" src="/gyaanuday/uploads/profile_photos/${data.profile_photo}" alt="${data.username}">`;
+              profileHtml = `<img class="h-12 w-12 rounded-full object-cover profile-img" src="./uploads/profile_photos/${data.profile_photo}" alt="${data.username}">`;
             } else {
               const initial = data.username.charAt(0).toUpperCase();
               profileHtml = `<div class="h-12 w-12 rounded-full bg-[#A7D820] flex items-center justify-center text-white font-bold text-lg profile-initial">${initial}</div>`;

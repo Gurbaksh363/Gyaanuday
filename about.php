@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once __DIR__ . "/../config/database.php";
+require_once __DIR__ . "/config/database.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -87,7 +87,7 @@ require_once __DIR__ . "/../config/database.php";
       <h1 class="text-4xl font-bold text-center font-archivo mb-8">About Gyaanuday</h1>
       
       <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-        <img src="/gyaanuday/public/images/aboutus/about.jpg" alt="About Gyaanuday" class="w-full h-64 object-cover" onerror="this.src='https://via.placeholder.com/1200x400?text=About+Gyaanuday'">
+        <img src="./images/aboutus/about.jpg" alt="About Gyaanuday" class="w-full h-64 object-cover" onerror="this.src='https://via.placeholder.com/1200x400?text=About+Gyaanuday'">
         
         <div class="p-8">
           <h2 class="text-2xl font-semibold mb-4 font-archivo">Our Mission</h2>

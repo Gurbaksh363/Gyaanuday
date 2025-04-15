@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once __DIR__ . "/../config/database.php";
+require_once __DIR__ . "/config/database.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -89,7 +89,7 @@ require_once __DIR__ . "/../config/database.php";
   <!-- Include navigation -->
   <?php include 'navigation.php'; ?>
 
-  <header class="relative w-full h-[70vh] bg-cover" style="background-image: url('/gyaanuday/public/images/discover/discover.jpg'); background-position: center bottom;">
+  <header class="relative w-full h-[70vh] bg-cover" style="background-image: url('./images/discover/discover.jpg'); background-position: center bottom;">
     <div class="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-start justify-center text-left text-white pl-16">
       <h1 class="text-[32px] leading-[48px] font-archivo font-bold">Discover Projects</h1>
       <p class="mt-2 text-[16px] leading-[26px]">Unleash creativity through hands-on learning</p>
@@ -101,7 +101,7 @@ require_once __DIR__ . "/../config/database.php";
     <h2 class="text-[32px] leading-[48px] font-bold text-center mb-6 text-[#171a1f] font-archivo">Popular Projects</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <?php
-      require_once __DIR__ . "/../config/database.php";
+      require_once __DIR__ . "/config/database.php";
       $stmt = $pdo->query("SELECT p.id, p.title, p.project_file, p.description, p.tags, u.username, p.thumbnail FROM projects p JOIN users u ON p.user_id = u.id ORDER BY p.created_at DESC LIMIT 6");
       $projects = $stmt->fetchAll();
 
@@ -156,16 +156,16 @@ require_once __DIR__ . "/../config/database.php";
       <?php
       // Define common categories with their images
       $popularCategories = [
-        'Web Development' => '/gyaanuday/public/images/thumbnail/Web Development.jpg',
-        'Mobile Apps' => '/gyaanuday/public/images/thumbnail/Mobile Apps.jpg',
-        'Data Analysis' => '/gyaanuday/public/images/thumbnail/Data Analysis.jpg',
-        'UI/UX Design' => '/gyaanuday/public/images/thumbnail/UIUX Design.png',
-        'AI & ML' => '/gyaanuday/public/images/thumbnail/aiml.jpg',
-        'Blockchain' => '/gyaanuday/public/images/thumbnail/Blockchian.jpg',
-        'Game Development' => '/gyaanuday/public/images/thumbnail/Game Development.jpg',
-        'Cybersecurity' => '/gyaanuday/public/images/thumbnail/Cybersecurity.webp',
-        'IoT Projects' => '/gyaanuday/public/images/thumbnail/IoT Projects.jpg',
-        'Cloud Computing' => '/gyaanuday/public/images/thumbnail/Cloud Computing.jpg'
+        'Web Development' => './images/thumbnail/Web Development.jpg',
+        'Mobile Apps' => './images/thumbnail/Mobile Apps.jpg',
+        'Data Analysis' => './images/thumbnail/Data Analysis.jpg',
+        'UI/UX Design' => './images/thumbnail/UIUX Design.png',
+        'AI & ML' => './images/thumbnail/aiml.jpg',
+        'Blockchain' => './images/thumbnail/Blockchian.jpg',
+        'Game Development' => './images/thumbnail/Game Development.jpg',
+        'Cybersecurity' => './images/thumbnail/Cybersecurity.webp',
+        'IoT Projects' => './images/thumbnail/IoT Projects.jpg',
+        'Cloud Computing' => './images/thumbnail/Cloud Computing.jpg'
       ];
       
       // Display categories as clickable cards

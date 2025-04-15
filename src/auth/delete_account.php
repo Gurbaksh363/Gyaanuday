@@ -5,7 +5,7 @@ require_once __DIR__ . "/../../config/database.php";
 // Check if user is logged in with password provided
 if (!isset($_SESSION['user_id']) || !isset($_POST['password']) || empty($_POST['password'])) {
     $_SESSION['error'] = !isset($_SESSION['user_id']) ? 'Login required' : 'Password required';
-    header('Location: ../../public/' . (!isset($_SESSION['user_id']) ? 'login.php' : 'profile.php'));
+    header('Location: ../../' . (!isset($_SESSION['user_id']) ? 'login.php' : 'profile.php'));
     exit;
 }
 
@@ -20,7 +20,7 @@ try {
     
     if (!$user || !password_verify($password, $user['password'])) {
         $_SESSION['error'] = 'Incorrect password';
-        header('Location: ../../public/profile.php');
+        header('Location: ../../profile.php');
         exit;
     }
     
@@ -65,7 +65,7 @@ try {
     session_destroy();
     session_start();
     $_SESSION['success'] = 'Your account has been deleted';
-    header('Location: ../../public/login.php');
+    header('Location: ../../login.php');
     exit;
     
 } catch (PDOException $e) {
@@ -73,7 +73,7 @@ try {
     if ($pdo->inTransaction()) $pdo->rollBack();
     
     $_SESSION['error'] = 'Error deleting account';
-    header('Location: ../../public/profile.php');
+    header('Location: ../../profile.php');
     exit;
 }
 ?>

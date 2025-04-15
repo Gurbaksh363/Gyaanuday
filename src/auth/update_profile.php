@@ -5,7 +5,7 @@ require_once __DIR__ . "/../../config/database.php";
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     $_SESSION['error'] = "You must be logged in to update your profile.";
-    header("Location: ../../public/login.php");
+    header("Location: ../../login.php");
     exit;
 }
 
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validate username
     if (empty($original_username)) {
         $_SESSION['error'] = "Username cannot be empty.";
-        header("Location: ../../public/profile.php");
+        header("Location: ../../profile.php");
         exit;
     }
     
@@ -35,13 +35,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         if (!in_array($_FILES['profile_photo']['type'], $allowed_types)) {
             $_SESSION['error'] = "Only JPG and PNG files are allowed.";
-            header("Location: ../../public/profile.php");
+            header("Location: ../../profile.php");
             exit;
         }
         
         if ($_FILES['profile_photo']['size'] > $max_size) {
             $_SESSION['error'] = "File size must be less than 5MB.";
-            header("Location: ../../public/profile.php");
+            header("Location: ../../profile.php");
             exit;
         }
         
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $params = [$bio, $filename, $user_id];
         } else {
             $_SESSION['error'] = "Failed to upload file.";
-            header("Location: ../../public/profile.php");
+            header("Location: ../../profile.php");
             exit;
         }
     }
@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     // Redirect back to profile page
-    header("Location: ../../public/profile.php");
+    header("Location: ../../profile.php");
     exit;
 }
 ?>

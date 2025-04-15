@@ -62,7 +62,7 @@
     $stmt = $pdo->prepare("INSERT INTO projects (user_id, title, project_file, description, tags, thumbnail) VALUES (?, ?, ?, ?, ?, ?)");
     try {
       $stmt->execute([$userId, $title, $fileName, $description, $tags, $thumbnailFileName]);
-      header("Location: /gyaanuday/public/index.php");
+      header("Location: ../../index.php");
       exit;
     } catch (\PDOException $e) {
       die("Project upload failed: " . $e->getMessage());
