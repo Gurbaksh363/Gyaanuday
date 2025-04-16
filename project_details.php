@@ -201,6 +201,37 @@ require_once __DIR__ . "/config/database.php";
       transform: scale(1.05);
       box-shadow: 0 0 10px rgba(167, 216, 32, 0.3);
     }
+    
+    /* Fix for PDF display layout */
+    .pdf-container {
+      position: relative;
+      width: 100%;
+      height: 0;
+      padding-bottom: 75%; /* Aspect ratio */
+      overflow: hidden;
+      border-radius: 0.5rem;
+    }
+    
+    .pdf-container object {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    
+    /* Ensure grid structure stays intact */
+    .project-content-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+    
+    @media (min-width: 1024px) {
+      .project-content-grid {
+        grid-template-columns: 2fr 1fr;
+      }
+    }
   </style>
 </head>
 
@@ -365,7 +396,7 @@ require_once __DIR__ . "/config/database.php";
       </div>
 
       <!-- Project Content -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 project-content-grid">
         <!-- Left Column - Thumbnail and Details -->
         <div class="lg:col-span-2">
           <div class="rounded-lg overflow-hidden shadow-md mb-6 card">
@@ -384,17 +415,29 @@ require_once __DIR__ . "/config/database.php";
               <img src="<?php echo $projectFile; ?>" alt="Project Preview" class="w-full h-auto rounded-lg">
             <?php elseif ($projectExt === 'pdf'): ?>
               <h2 class="text-xl font-semibold mt-8 mb-4 text-[#171a1f] font-archivo">PDF Preview</h2>
-              <div class="rounded-lg overflow-hidden border border-gray-300">
-                <object data="<?php echo $projectFile; ?>" type="application/pdf" width="100%" height="500px">
-                  <p>Unable to display PDF. <a href="<?php echo $projectFile; ?>" download>Download</a> instead.</p>
-                </div>
-              </object>
+              <div class="pdf-container border border-gray-300">
+                <object data="<?php echo $projectFile; ?>" type="application/pdf">
+                  <p class="p-4 text-center">Unable to display PDF. <a href="<?php echo $projectFile; ?>" download class="text-[#A7D820]">Download</a> instead.</p>
+                </object>
+              </div>
             <?php elseif (in_array($projectExt, ['mp4', 'webm', 'ogg'])): ?>
               <h2 class="text-xl font-semibold mt-8 mb-4 text-[#171a1f] font-archivo">Video Preview</h2>
               <video controls class="w-full rounded-lg">
                 <source src="<?php echo $projectFile; ?>" type="video/<?php echo $projectExt; ?>">
                 Your browser does not support the video tag.
               </video>
+            <?php elseif (in_array($projectExt, ['mp3', 'wav', 'm4a'])): ?>
+              <h2 class="text-xl font-semibold mt-8 mb-4 text-[#171a1f] font-archivo">Audio Preview</h2>
+              <div class="bg-gray-100 p-6 rounded-lg flex flex-col items-center">
+                <div class="w-20 h-20 mb-4 rounded-full bg-[#A7D820] flex items-center justify-center">
+                  <i class="fas fa-music text-white text-3xl"></i>
+                </div>
+                <p class="mb-4 text-gray-700"><?php echo $title; ?></p>
+                <audio controls class="w-full">
+                  <source src="<?php echo $projectFile; ?>" type="audio/<?php echo $projectExt === 'm4a' ? 'mp4' : $projectExt; ?>">
+                  Your browser does not support the audio element.
+                </audio>
+              </div>
             <?php endif; ?>
           </div>
         </div>
@@ -525,9 +568,18 @@ require_once __DIR__ . "/config/database.php";
   </div>
 
   <?php include 'components/footer.php'; ?>
-
+  
+  <!-- Fix for footer to ensure it spans full width -->
   <script>
-  // Search functionality
+    // Ensure footer spans full width
+    document.addEventListener('DOMContentLoaded', function() {
+      const footer = document.querySelector('footer');
+      if (footer) {
+        footer.classList.add('w-full');
+      }
+    });
+    
+    // Search functionality
   const searchButton = document.getElementById('searchButton');
   const searchOverlay = document.getElementById('searchOverlay');
   const closeSearch = document.getElementById('closeSearch');

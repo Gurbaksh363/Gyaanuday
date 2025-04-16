@@ -209,7 +209,7 @@ require_once __DIR__ . "/config/database.php";
           foreach ($projects as $project) {
               $projectId = htmlspecialchars($project['id']);
               $fileName = htmlspecialchars($project['thumbnail']);
-              $filePath = "./uploads/" . $fileName;
+              $filePath = "uploads/" . $fileName;
               $title = htmlspecialchars($project['title']);
               $description = htmlspecialchars($project['description']);
               $username = htmlspecialchars($project['username']);
@@ -217,8 +217,8 @@ require_once __DIR__ . "/config/database.php";
               
               $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
               
-              // Determine thumbnail
-              if (in_array($ext, ['jpg', 'jpeg', 'png']) && file_exists($_SERVER['DOCUMENT_ROOT'] . "/gyaanuday/uploads/" . $fileName)) {
+              // Determine thumbnail - Fix the path to correctly include the slash
+              if (in_array($ext, ['jpg', 'jpeg', 'png']) && file_exists($_SERVER['DOCUMENT_ROOT'] . "/uploads/" . $fileName)) {
                   $thumb = $filePath;
               } else {
                   $thumb = "./assets/default_icon.png";
